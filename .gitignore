@@ -1,0 +1,59 @@
+# ##########################################
+# DEPENDÊNCIAS (Nunca envie para o Git)
+# ##########################################
+node_modules/
+jspm_packages/
+web_modules/
+
+# ##########################################
+# VARIÁVEIS DE AMBIENTE (Senhas e chaves)
+# ##########################################
+.env
+.env.production
+
+# NÃO ignore o arquivo de exemplo (ele serve de guia para outros devs)
+!.env.example
+
+# ##########################################
+# LOGS E ERROS
+# ##########################################
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ##########################################
+# COBERTURA DE TESTES
+# ##########################################
+coverage/
+.nyc_output/
+
+# ##########################################
+# COMPILAÇÃO / BUILD (Se usar TypeScript, Babel, etc.)
+# ##########################################
+dist/
+build/
+.cache/
+
+# ##########################################
+# ARQUIVOS DO SISTEMA OPERACIONAL / IDEs
+# ##########################################
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editores de Código (VS Code, WebStorm)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
