@@ -8,6 +8,7 @@ const ApiResponse = require('../models/api.model');
 // const UsuarioData = require('../models/usuario.model');
 
 const UsuarioService = require('../services/usuario.service');
+const UsuarioPerfisService = require('../services/usuarioPerfis.service');
 
 // ==========================================
 // ROTAS
@@ -200,6 +201,81 @@ router.delete('/:id', async (req, res) => {
                 .status(status)
                 .json(ApiResponse(false, "Usuário Deletar: "+error.message, null, error.internalCode));
     }
+});
+
+/*
+ * ROTA [GET] - Busca os associados Usuário e Perfis (R)
+ *      URL: 'api/usuario/perfis/1
+ *      Params: (number) - Id do usuario
+ */
+router.get('/perfis/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const listData = await UsuarioPerfisService.buscarPerfisPorUsuario(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário Associados: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Associados: "+error.message,null, error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [POST] - Criar Usuário e Perfis(C)
+ *      URL: 'api/usuario/perfis/1
+ *      Params: (number) - Id do usuario
+ *      Body: {
+                "lista": [{"idPerfil": "?", "descricao": "?????"},...]
+ *          }
+ */
+router.post('/perfis/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
+    }
+    
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await UsuarioPerfisService.criarPerfis(idParm, req.body.lista);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Usuário Associados: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Associados: "+error.message, null,error.internalCode));
+    }
+
 });
 
 module.exports = router;
