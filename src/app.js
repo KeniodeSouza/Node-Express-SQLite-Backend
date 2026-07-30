@@ -19,6 +19,7 @@ const reportsRoutes = require('./routes/reports.routes');
  * Monta a aplicação para execução
  */
 const app = express();
+app.use(express.json()); // Permite que o Express leia JSON no corpo das requisições
 app.use(cors());
 app.use(bodyParser.json());
 

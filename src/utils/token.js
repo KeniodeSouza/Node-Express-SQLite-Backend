@@ -1,3 +1,6 @@
+/*
+ *  Gera o token para sessão
+ */
 const jwt = require('jsonwebtoken');
 
 // Chave secreta que APENAS o seu servidor deve saber. 

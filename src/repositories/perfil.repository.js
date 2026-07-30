@@ -57,7 +57,7 @@ class PerfilRepository {
     }
 
     /*
-     *  Buscar um unico registro por Nome
+     *  Buscar um unico registro por Unique
      */
     static async buscarPorNome(nome) {
         const db = await openDb('base');

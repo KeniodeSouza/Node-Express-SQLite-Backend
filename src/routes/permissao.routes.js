@@ -62,7 +62,7 @@ router.get('/', async (req, res) => {
 /*
  * ROTA [GET] - Buscar um Permissao por ID (R)
  *      URL: 'api/permissao/id/1
- *      Params: (number) - id do registro
+ *      Params: (number) - id do registro na tabela
  */
 router.get('/id/:id', async (req, res) => {
     if (!req.params.id) {
@@ -94,7 +94,7 @@ router.get('/id/:id', async (req, res) => {
 /*
  * ROTA [PUT] - Atualizar Permissao (U)
  *      URL: 'api/permissao/1
- *      Params: (number) - Id do registro
+ *      Params: (number) - Id do registro na tabela
  *      Body: {
  *              'descricao':
  *          }
@@ -134,7 +134,7 @@ router.put('/:id', async (req, res) => {
 /*
  * ROTA [DELETE] - Deletar Permissão (D)
  *      URL: 'api/permissao/1
- *      Params: (number) - Id do registro
+ *      Params: (number) - Id do registro na tabela
  */
 router.delete('/:id', async (req, res) => {
     if (!req.params.id) {

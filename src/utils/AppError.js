@@ -1,4 +1,6 @@
-// AppError.js
+/*
+ * AppError - Tratamento de Erros 
+ */
 class AppError extends Error {
     constructor(message, internalCode = null, statusCode = 500) {
         super(message);

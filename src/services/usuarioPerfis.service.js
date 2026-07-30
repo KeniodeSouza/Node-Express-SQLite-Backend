@@ -2,6 +2,7 @@
  *
  */
 const AppError = require('../utils/AppError');
+
 const UsuarioRepository = require('../repositories/usuario.repository');
 const PerfilRepository = require('../repositories/perfil.repository');
 const UsuarioPerfisRepository = require('../repositories/usuarioPerfis.repository');
@@ -15,17 +16,17 @@ class UsuarioPerfisService {
         return null;
     }
 
-    // [READ] - Procedimento para listar todos os usuários
+    // [READ] - Procedimento para listar todos os perfis por Usuario(id)
     static async buscarPerfisPorUsuario(id){
-		const retorno = await UsuarioRepository.buscarPorId(id);
+        const retorno = await UsuarioRepository.buscarPorId(id);
         if (!retorno) {
             throw new AppError("Usuário não existe", 2001, 404);
         }
-		const { senha, ...usuario } = retorno;
+        const { senha, ...usuario } = retorno;
 
         const list1 = await UsuarioPerfisRepository.buscarPerfisPorUsuario(id);
         if (!list1) {
-            throw new AppError("Lista de Perfis esta vazia", 2002, 404);
+            throw new AppError("Lista de associação de Perfis esta vazia", 2002, 404);
         }
 
         // Criamos um Set com os IDs presentes na list1 para busca rápida O(1)
@@ -33,7 +34,7 @@ class UsuarioPerfisService {
 
         const list2 = await PerfilRepository.listarTodos();
         if (!list2) {
-            throw new AppError("Lista de UsuarioPerfis esta vazia", 2002, 404);
+            throw new AppError("Lista de perfil esta vazia", 2002, 404);
         }
 
         // Mapeamos a list2 adicionando a propriedade 'isConectado' para true/false

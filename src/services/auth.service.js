@@ -4,6 +4,7 @@
 require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
 
 const AppError = require('../utils/AppError');
 const UsuarioRepository = require('../repositories/usuario.repository');
@@ -41,7 +42,10 @@ class AuthService {
         if (!list || list.length === 0) {
             throw new AppError("Credencial não localizada", 2001, 404);
         }
-        if( list[0].senha != senha ){
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha // await bcrypt.hash(senha, 10);
+
+        if( list[0].senha != senhaCrypt ){ 
             throw new AppError("Senha esta invalida.", 2002, 404);
         }
 
@@ -63,7 +67,10 @@ class AuthService {
      *      @param {string} - senha
      */
     static async atualizarSenha(email, senha ){
-        const result = await UsuarioRepository.resetPassword(email, senha)
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha // await bcrypt.hash(senha, 10);
+
+        const result = await UsuarioRepository.resetPassword(email, senhaCrypt)
         if( !result || result.changes == 0 ){
             throw new AppError("Usuário não modou a Senha", 2003, 404);
         }

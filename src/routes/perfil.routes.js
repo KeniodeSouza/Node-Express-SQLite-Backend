@@ -5,7 +5,6 @@ const express = require('express');
 const router = express.Router();
 
 const ApiResponse = require('../models/api.model');
-// const PerfilData = require('../models/perfil.model');
 
 const PerfilService = require('../services/perfil.service');
 const PerfilPermissoesService = require('../services/perfilPermissoes.service');
@@ -23,7 +22,6 @@ const PerfilPermissoesService = require('../services/perfilPermissoes.service');
  *          }
  */
 router.post('/', async (req, res) => {
-    // Se o body for vazio ou indefinido, barra o acesso
     if (!req.body || Object.keys(req.body).length === 0) {
         return res
                 .status(400) 
@@ -65,7 +63,7 @@ router.get('/', async (req, res) => {
 /*
  * ROTA [GET] - Buscar um Perfil por ID (R)
  *      URL: 'api/perfil/id/1
- *      Params: (number) - id do registro
+ *      Params: (number) - id do registro na tabela
  */
 router.get('/id/:id', async (req, res) => {
     if (!req.params.id) {
@@ -97,7 +95,7 @@ router.get('/id/:id', async (req, res) => {
 /*
  * ROTA [GET] - Buscar um Perfil por Email (R)
  *      URL: 'api/perfil/nome/Gerente
- *      Params: (string) - Nome do perfil
+ *      Params: (string) - Nome do perfil (UNIQUE)
  */
 router.get('/nome/:nome', async (req, res) => {
     if (!req.params.nome) {
@@ -122,7 +120,7 @@ router.get('/nome/:nome', async (req, res) => {
 /*
  * ROTA [PUT] - Atualizar Perfil (U)
  *      URL: 'api/perfil/1
- *      Params: (number) - Id do registro
+ *      Params: (number) - Id do registro na tabela
  *      Body: {
  *              'descricao':
  *          }
@@ -162,7 +160,7 @@ router.put('/:id', async (req, res) => {
 /*
  * ROTA [DELETE] - Deletar Perfil (D)
  *      URL: 'api/perfil/1
- *      Params: (number) - Id do registro
+ *      Params: (number) - Id do registro na tabela
  */
 router.delete('/:id', async (req, res) => {
     if (!req.params.id) {
@@ -194,7 +192,7 @@ router.delete('/:id', async (req, res) => {
 /*
  * ROTA [GET] - Busca os associados Perfil com Permissoes (R)
  *      URL: 'api/perfil/permissoes/1
- *      Params: (number) - Id do Perfil
+ *      Params: (number) - Id do registro na tabela (Perfil)
  */
 router.get('/permissoes/:id', async (req, res) => {
     if (!req.params.id) {
@@ -225,9 +223,9 @@ router.get('/permissoes/:id', async (req, res) => {
 });
 
 /*
- * ROTA [POST] - Criar associação de Perfil a Permissões (C)
+ * ROTA [POST] - Criar associação de Perfil com Permissões (C)
  *      URL: 'api/perfil/permissoes/1
- *      Params: (number) - Id do usuario
+ *      Params: (number) - Id do registro na tabela (Perfil)
  *      Body: {
                 "lista": [{"idPermissao": "?", "descricao": "?????"},...]
  *          }

@@ -25,7 +25,6 @@ const AuthService = require('../services/auth.service');
  *              }
  */
 router.post('/login', async (req, res) => {
-    // Se vazio/undefined, barramos o acesso
     if (!req.body || Object.keys(req.body).length === 0) {
         return res
                 .status(400)

@@ -1,18 +1,25 @@
 /*
  *
  */
+const bcrypt = require('bcrypt');
 const AppError = require('../utils/AppError');
+
 const UsuarioRepository = require('../repositories/usuario.repository');
 
 class UsuarioService {
 
     // [CREATE] - Procedimento para criar um novo usuário
     static async criar(dados){
+        const senha = dados.senha || 'Senha@123'
+
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha; // await bcrypt.hash(senha, 10);
+        
         const usuarioData = {
               nomeCompleto: dados.nomeCompleto,
               email: dados.email,
               telefone: dados.telefone || '(99) 99999-9999',
-              senha: dados.senha || 'Senha@123'
+              senha: senhaCrypt
         };
 
         const newData = await UsuarioRepository.criar(usuarioData);

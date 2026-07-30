@@ -5,7 +5,6 @@ const express = require('express');
 const router = express.Router();
 
 const ApiResponse = require('../models/api.model');
-// const UsuarioData = require('../models/usuario.model');
 
 const UsuarioService = require('../services/usuario.service');
 const UsuarioPerfisService = require('../services/usuarioPerfis.service');
@@ -25,7 +24,6 @@ const UsuarioPerfisService = require('../services/usuarioPerfis.service');
  *          }
  */
 router.post('/', async (req, res) => {
-    // Se o body for vazio ou indefinido, barra o acesso
     if (!req.body || Object.keys(req.body).length === 0) {
         return res
                 .status(400) 
@@ -52,7 +50,6 @@ router.post('/', async (req, res) => {
  */
 router.get('/', async (req, res) => {
     try {
-        // Use `await` here when calling the service
         const listData = await UsuarioService.listarTodos();
         return res
                 .status(200)
@@ -68,7 +65,7 @@ router.get('/', async (req, res) => {
 /*
  * ROTA [GET] - Buscar um usuário por ID (R)
  *      URL: 'api/usuario/id/1
- *      Params: (number) - id do registro
+ *      Params: (number) - id do registro na tabela
  */
 router.get('/id/:id', async (req, res) => {
     if (!req.params.id) {
@@ -133,7 +130,7 @@ router.get('/email/:email', async (req, res) => {
 /*
  * ROTA [PUT] - Atualizar Usuário (U)
  *      URL: 'api/usuario/1
- *      Params: (number) - Id do registro do usuario
+ *      Params: (number) - Id do registro de tabela
  *      Body: {
  *              'nomeCompleto': 
  *              'telefone':
@@ -174,7 +171,7 @@ router.put('/:id', async (req, res) => {
 /*
  * ROTA [DELETE] - Deletar Usuário (D)
  *      URL: 'api/usuario/1
- *      Params: (number) - Id do registro do usuario
+ *      Params: (number) - Id do registro da tabela
  */
 router.delete('/:id', async (req, res) => {
     if (!req.params.id) {
@@ -206,7 +203,7 @@ router.delete('/:id', async (req, res) => {
 /*
  * ROTA [GET] - Busca os associados Usuário e Perfis (R)
  *      URL: 'api/usuario/perfis/1
- *      Params: (number) - Id do usuario
+ *      Params: (number) - Id do registro na tabela (Usuario)
  */
 router.get('/perfis/:id', async (req, res) => {
     if (!req.params.id) {
@@ -237,11 +234,11 @@ router.get('/perfis/:id', async (req, res) => {
 });
 
 /*
- * ROTA [POST] - Criar Usuário e Perfis(C)
+ * ROTA [POST] - Criar associação de Usuário com Perfis(C)
  *      URL: 'api/usuario/perfis/1
- *      Params: (number) - Id do usuario
+ *      Params: (number) - Id do registro na tabela (Usuario)
  *      Body: {
-                "lista": [{"idPerfil": "?", "descricao": "?????"},...]
+ *              "lista": [{"idPerfil": "?", "descricao": "?????"},...]
  *          }
  */
 router.post('/perfis/:id', async (req, res) => {

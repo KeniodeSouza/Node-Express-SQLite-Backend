@@ -2,13 +2,14 @@
  *
  */
 const AppError = require('../utils/AppError');
+
 const PerfilRepository = require('../repositories/perfil.repository');
 const PermissaoRepository = require('../repositories/permissao.repository');
 const PerfilPermissoesRepository = require('../repositories/perfilPermissoes.repository');
 
 class PerfilPermissoesService {
 
-    // [CREATE] - Procedimento associar perfil a permissoes
+    // [CREATE] - Procedimento de associar perfil a permissoes
     static async criarPermissoes(id, lista){
         const retorno = await PerfilPermissoesRepository.criarPerfis(id, lista);
 
@@ -31,7 +32,7 @@ class PerfilPermissoesService {
         const idsList1 = new Set(list1.map(item => item.id_permissao));
         const list2 = await PermissaoRepository.listarTodos();
         if (!list2) {
-            throw new AppError("Lista de Perfils esta vazia", 2002, 404);
+            throw new AppError("Lista de associação de Perfils esta vazia", 2002, 404);
         }
         
         // Mapeamos a list2 adicionando a propriedade 'isConectado' para true/false

@@ -2,7 +2,8 @@ const { openDb } = require('../config/database');
 
 class UsuarioPerfisRepository {
     /*
-     *  Listar os Perfis por usuario
+     *  Lista os Perfis de um determinado usuario
+     *  id (number) - Id do Usuario
      */
     static async buscarPerfisPorUsuario(id) {
         const db = await openDb('base');

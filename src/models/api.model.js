@@ -1,9 +1,9 @@
 /**
  * Modelo padronizado para respostas HTTP
  * @param {boolean} success - Indica se a operação deu certo (true) ou se falhou (false)
- * @param {string} message  - Mensagem descritiva
- * @param {number} code     - Codigo Interno
+ * @param {string}  message  - Mensagem descritiva
  * @param {any} [data=null] - Dados retornados (opcional)
+ * @param {number} code [code=null] - Codigo Interno (opcional)
  */
 const ApiResponse = (success, message, data = null, code = null) => {
   return {

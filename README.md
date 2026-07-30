@@ -58,23 +58,24 @@ Este projeto é uma API RESTful desenvolvida utilizando **Node.js**, **Express**
 
 Antes de começar, você precisará ter instalado em sua máquina:
 - [Node.js](https://nodejs.org/) (Versão 18 ou superior)
+- [SQLite3](https://www.sqlite.org/)
 - [Git](https://git-scm.com/)
 
-### Passo a passo
+### Via GITHUB
 
 ```bash
-# 1. Clone este repositório
-$ git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+# Clone este repositório
+$ git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/KeniodeSouza/Node-Express-Backend.git)
 
-# 2. Acesse a pasta do projeto
-$ cd SEU_REPOSITORIO
+# Acesse a pasta do projeto
+$ cd Node-Express-SQLite-Backend
 
-# 3. Instale as dependências
+# Instale as dependências
 $ npm install
 
-# 4. Execute a aplicação em modo de desenvolvimento
+# Execute a aplicação em modo de desenvolvimento
 $ npm run dev # ou npm start# Servidor Backend com Node.js + Express + SQLite para teste, via API
-
+```
 
 ## Criar projeto Node
 ```bash
@@ -91,6 +92,7 @@ npm install sqlite3 sqlite bcrypt
 npm install nodemon --save-dev
 
 ```
+---
 
 ## Customizar o instalação (package.json)
 ```json
@@ -131,22 +133,40 @@ npm install nodemon --save-dev
 ```text
 Node-Express-Sqlite-Backend/
  ├── src/
+ │   ├── config/
+ │   │   └── database.js
+ │   ├── database/
+ │   │   └── base.db
+ │   ├── models/
+ │   │   ├── api.model.js
+ │   │   ├── auth.model.js
+ │   │   └── usuario.model.js
+ │   ├── repositories/
+ │   │   ├── perfil.repository.js
+ │   │   ├── perfilPermissoes.repository.js
+ │   │   ├── permissao.repository.js
+ │   │   ├── usuario.repository.js
+ │   │   └── usuarioPerfis.repository.js
  │   ├── routes/
  │   │   ├── auth.routes.js
+ │   │   ├── perfil.routes.js
+ │   │   ├── permissao.routes.js
  │   │   ├── reports.routes.js
  │   │   └── usuario.routes.js
  │   ├── services/
  │   │   ├── auth.service.js
+ │   │   ├── perfil.service.js
+ │   │   ├── permissao.service.js
  │   │   ├── reports.service.js
  │   │   └── usuario.service.js
- │   ├── repositories/
- │   │   └── usuario.repository.js
  │   ├── utils/
  │   │   ├── appError.js
  │   │   └── token.js
  │   └── app.js
  ├── .env
- └── package.json
+ ├── .gitignore
+ ├── package.json
+ └── README.md
 ```
 
 ---
@@ -243,6 +263,17 @@ enviarEmail();
 
 ## 🛠️Configuração do servidor
 
+### Variaveis de ambiente Docker (.env)
+```text
+PORT=3000
+
+EMAIL_HOST=localhost
+EMAIL_PORT=1025
+EMAIL_USER=smtp@localhost
+EMAIL_PASS=
+
+```
+
 ### Variaveis de ambiente Gmail (.env)
 ```text
 PORT=3000
@@ -253,54 +284,55 @@ EMAIL_USER=seu-email@gmail.com
 EMAIL_PASS=sua-senha-de-app
 ```
 
-### Variaveis de ambiente Docker (.env)
-```text
-PORT=3000
-
-EMAIL_HOST=localhost
-EMAIL_PORT=1025
-EMAIL_USER=smtp@local.com
-EMAIL_PASS=
-
-```
-
 ---
 
 ### Modulo principal da aplicação (app.js)
 ```js
 /*
- * Servidor Node e Express para teste de API
+ *  Servidor Principal Express com Múltiplas Rotas
  */
-require('dotenv').config();
-
+require('dotenv').config(); 
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-// 1. Importe os seus novos módulos de rotas aqui
-const authRoutes = require('./routes/auth.routes');
-const usersRoutes = require('./routes/user.routes');
+// Importe os seus novos módulos de rotas aqui
+const authRoutes = require('./routes/auth.routes'); 
+// Entidade basicas de segurança:
+const usuarioRoutes = require('./routes/usuario.routes');
+const perfilRoutes = require('./routes/perfil.routes');
+const permissaoRoutes = require('./routes/permissao.routes');
+// Dashbord: 
 const reportsRoutes = require('./routes/reports.routes');
 
+/*
+ * Monta a aplicação para execução
+ */
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// 2. Registre as rotas no Express
+// Registre as rotas no Express
 app.use('/api/auth', authRoutes);
-app.use('/api/users', usersRoutes);
+app.use('/api/usuario', usuarioRoutes);
+app.use('/api/perfil', perfilRoutes);
+app.use('/api/permissao', permissaoRoutes);
 app.use('/api/reports', reportsRoutes);
 
 // Inicialização
-const PORT = process.env.PORT || 3000;;
+const PORT = process.env.PORT || 3000;
+// console.log('diretorio',__dirname);
+
 app.listen(PORT, () => {
-  console.log(`\n==================================================`);
-  console.log(`🚀 Servidor rodando com sucesso na porta ${PORT}`);
-  console.log(`==================================================`);
-  console.log(`🎌 Auth:      http://localhost:${PORT}/api/auth`);
-  console.log(`👥 Usuários:  http://localhost:${PORT}/api/users`);
-  console.log(`📊 Reports:   http://localhost:${PORT}/api/reports`);
-  console.log(`==================================================\n`);
+    console.log(`\n==================================================`);
+    console.log(`🚀 Servidor rodando com sucesso na porta ${PORT}`);
+    console.log(`==================================================`);
+    console.log(`🚧 Auth:      http://localhost:${PORT}/api/auth`);
+    console.log(`👥 Usuário:   http://localhost:${PORT}/api/usuario`);
+    console.log(`👥 Perfil:    http://localhost:${PORT}/api/perfil`);
+    console.log(`👥 Permissao: http://localhost:${PORT}/api/permissao`);
+    console.log(`📊 Reports:   http://localhost:${PORT}/api/reports`);
+    console.log(`==================================================\n`);
 });
 ```
 
@@ -310,299 +342,1519 @@ app.listen(PORT, () => {
 dados em memória e exportamos as funções para uso nas rotas.
 
 
-## Módulos do roteamento
+## Módulos de Configuração
 
-### Rotas de Autorização (routes/auth.route.js)
+### Configuração do banco de dados (config/database.js)
 ```js
-/*
- * 
+const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const { open } = require('sqlite');
+
+/**
+ * Abre a conexão com o banco de dados SQLite especificado.
+ * @param {string} dbName - Nome do arquivo do banco (ex: 'base', 'gestao', ...)
  */
-const express = require('express');
-const router = express.Router();
-const { gerarToken } = require('../utils/token'); 
-const authService = require('../services/auth.service'); 
-const userService = require('../services/user.service'); 
+async function openDb(dbName = 'gestao') {
+  // Constrói o caminho dinamicamente conforme o banco solicitado
+  const dbPath = path.resolve(`./src/database/${dbName}.db`);
 
-// ==========================================
-// ROTAS
-// ==========================================
-
-// Rota [GET] - busca padrão (C)
-//      URL: 'api/auth
-router.get('/', (req, res) => {
-    
-  const dados = authService.buscarTodos();
-    
-  res.json({
-    message: "Auth Todos: Executado com sucesso",
-    data: dados
+  return open({
+    filename: dbPath,
+    driver: sqlite3.Database
   });
-});
+}
 
-// Rota [POST] - Login que executa o procedimento
-//      URL: 'api/auth/login
-router.post('/login', (req, res) => {
-  // Se vazio/undefined, barramos o acesso
-  
-  if( !req.body ){
-    return res.status(401).json({
-      message: "Auth Login: Dados não informados.",
-      data: null
-    });
-  }
-
-  const { email, senha } = req.body;
-
-  // Busca a credencial de autorização
-  const dados = authService.buscarPorCredencial(email);
-
-  // Se o procedimento retornar vazio/undefined, barramos o acesso
-  if (!dados) {
-    return res.status(401).json({
-      message: "Auth Login: E-mail esta incorreto.",
-      data: null
-    });
-  }
-
-  // Se a senha informada esta correta
-  if( !authService.isSenhaValida(email, senha) ){
-    return res.status(401).json({
-      message: "Auth Login: Senha esta incorreta.",
-      data: null
-    });
-  }
-
-  // Se encontrou, prossegue com o Token
-  const tokenGenerated = gerarToken(dados);
-
-  const authResponse = {
-    "email": email,
-    "nomeCompleto": dados.nomeCompleto,
-    "token": tokenGenerated,
-    "permissoes": dados.permissoes
-  };
-
-  res.json({
-    message: "Auth Login: Executado com sucesso.",
-    data: authResponse
-  });
-});
-
-// Rota [PUT] - Alteracao da senha do usuario
-//      URL: 'api/auth/reset-password
-router.put('/resetPassword', (req, res) => {
-  if (!req.body) {
-    return res.status(401).json({
-      message: "Auth Erro de mudança de senha. Erro: Sem dados.",
-      data: null
-    });
-  }
-
-  const { email, senha } = req.body;
-  
-  // Busca a credencial de autorização
-  const dados = authService.buscarPorCredencial(email);
-  // Se o procedimento retornar vazio/undefined
-  if (!dados) {
-    return res.status(401).json({
-      message: "Auth resetPassword: Usuário não encontrado.",
-      data: null
-    });
-  }
-  
-  const user = userService.atualizarSenha(email, senha);
-console.log('Auth resetPassword', user);
-
-  // Gera um novo Token
-  const tokenGenerated = gerarToken(dados);
-
-  const authResponse = {
-    nomeCompleto: dados.nomeCompleto,
-    token: tokenGenerated,
-    permissoes: dados.permissoes
-  };
-
-  res.json({
-    message: "Auth resetPassword: Procedimento executado com sucesso.",
-    data: authResponse
-  });
- 
-});
-
-// Rota [POST] - Envio de email de Codigo de confirmação de alteracao
-//      URL: 'api/auth/sendEmail
-//          {
-//              "para": "keniodesouza@gmail.com",
-//              "assunto": "Testando Email para Node + Express",
-//              "texto": "[Email] - Este é um teste enviado via Nodemailer.",
-//          }
-router.post('/sendEmail', async (req, res) => {
-    if (!req.body) {
-        return res.status(401).json({
-                                    message: "Auth SendEmail: Body sem dados.",
-                                    data: null
-                                });
-    }
-
-    const { email, token } = req.body;
-    // Validação simples dos dados de entrada
-    if( !email || !token ){
-        return res.status(400).json({ 
-                                    message: "Auth SendEmail: Faltam dados obrigatórios para o envio.'",
-                                    data: null
-                                });
-    }
-    const assunto = "[Reset Password] - Verificação para troca de Password"
-    const texto = `
-Sr. Usuario.
-
-Este é um e-mail com o código de validação para troca de senha.
-
-         Codigo: ${token}
-
-OBS.: Não responda este e-mail
-
-Equipe tecnica
-`
-
-    const resp = await authService.enviarEmail(email, assunto, texto);
-
-    res.json({
-            message: "Auth SendEmail: Executado com sucesso.",
-            data: resp
-        });
-});
-
-module.exports = router;
+module.exports = { openDb };
 
 ```
 
+---
 
-### Rota de Usuários (routes/user.routes.js)
+
+## Módulos de modes
+
+### Modelo de HTTP/API (models/api.model.js)
+```js
+/**
+ * Modelo padronizado para respostas HTTP
+ * @param {boolean} success - Indica se a operação deu certo (true) ou se falhou (false)
+ * @param {string} message  - Mensagem descritiva
+ * @param {number} code     - Codigo Interno
+ * @param {any} [data=null] - Dados retornados (opcional)
+ */
+const ApiResponse = (success, message, data = null, code = null) => {
+  return {
+    success: success,
+    code: code,
+    message: message,
+    data: data,
+    timestamp: new Date().toISOString() // Formato UTC ISO (ex: 2026-07-21T12:43:47.000Z)
+  };
+};
+
+module.exports = ApiResponse;
+
+```
+
+### Modelo de Autorização (models/auth.model.js)
+```js
+class AuthData {
+  /**
+   * @param {string} email
+   * @param {string} nomeCompleto
+   * @param {string} telefone
+   * @param {string} token
+   * @param {Array<string>} permissoes
+   */
+  constructor({ email, nomeCompleto, telefone, token, permissoes = [] }) {
+    this.email = email;
+    this.nomeCompleto = nomeCompleto;
+	this.telefone = telefone;
+    this.token = token;
+    this.permissoes = permissoes;
+  }
+}
+
+module.exports = AuthData;
+```
+
+### Modelo de usuario (models/usuario.model.js)
+```js
+/**
+ * Modelo padronizado para usuario
+ * @param {number} id  (Opcional)
+ * @param {string} email  
+ * @param {string} nomeCompleto
+ * @param {string} telefone
+ * @param {string} senha (Opcional)
+ */
+const UsuarioModel = ( id = 0, email, nomeCompleto, telefone = null, senha = 'Senha@123' ) => {
+    return {
+        id: Number(id),
+        email: email,
+        nomeCompleto: nomeCompleto,
+        telefone: telefone,
+        senha: senha
+    }
+}
+
+module.exports = UsuarioModel;
+```
+
+---
+
+## Módulos do repositories
+
+Faz o acesso diretamento da base de dados 
+
+- Tabelas básicas
+
+### Repository de Autorização (repositories/usuario.repository.js)
+```js
+const { openDb } = require('../config/database');
+
+class UsuarioRepository {
+    /*
+     *  Inserir um novo registro na tabela
+     */
+    static async criar(dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "INSERT INTO auth_usuario (nomeCompleto, email, telefone, senha) VALUES (?, ?, ?, ?)",
+              [dados.nomeCompleto, dados.email, dados.telefone, dados.senha ]
+        );
+     
+        const novoDados = {
+            "id": retorno.lastID, 
+            "nomeCompleto": dados.nomeCompleto, 
+            "email": dados.email, 
+            "telefone": dados.telefone 
+        };
+        
+        // Retorna o objeto recebido concatenado com o id gerado no banco
+        return retorno ? novoDados : null;
+    }
+
+    /*
+     *  Listar todos os registros da tabela
+     */
+    static async listarTodos() {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+              "SELECT id, nomeCompleto, email, telefone, status, data_criacao " +
+              "FROM auth_usuario " +
+              "WHERE upper(nomeCompleto) not like '%ADMIN%' " +
+              "ORDER BY id ASC"
+        );
+
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por ID
+     */
+    static async buscarPorId(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_usuario " +
+              "WHERE upper(nomeCompleto) not like '%ADMIN%' " +
+              "AND id = ?",
+              [id]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por Unique
+     */
+    static async buscarPorEmail(email) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_usuario " +
+              "WHERE email = ?",
+              [email]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar as Credenciais do usuário por Unique
+     */
+    static async buscarCredencialPorEmail(email) {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+            "SELECT DISTINCT t1.id, t1.nomeCompleto, t1.telefone, t1.senha, t4.regra " +
+            "FROM auth_usuario t1 " +
+                "INNER JOIN auth_usuario_perfis t2 " +
+                        "ON t2.id_usuario = t1.id " +
+                "INNER JOIN auth_perfil_permissoes t3 " +
+                        "ON t3.id_perfil = t2.id_perfil " +
+                "INNER JOIN auth_permissao t4 " +
+                        "ON t4.id = t3.id_permissao " +
+            "WHERE email = ? ORDER BY 3 ASC",
+              [email]
+        );
+
+        return retorno || null;
+    }
+
+    /*
+     *  Atualizar um unico registro da tabela
+     */
+    static async atualizar(id, dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "UPDATE auth_usuario SET nomeCompleto = ?, telefone = ? WHERE id = ?",
+              [dados.nomeCompleto, dados.telefone, id]
+        );
+
+        return retorno;
+    }
+
+    /*
+     *  Atualizar a senha de um determinado usuario por Unique
+     */
+    static async resetPassword(email, senha) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "UPDATE auth_usuario " + 
+                "SET senha = ? WHERE email = ?",
+                        [senha, email]
+        );
+        return retorno;
+    }
+
+    /*
+     *  Excluir um unico registro da tabela
+     */
+    static async deletar(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "DELETE FROM auth_usuario WHERE id = ?",
+              [id]
+        );
+
+        return retorno;
+    }
+}
+
+module.exports = UsuarioRepository;
+```
+
+### Repository de Autorização (repositories/perfil.repository.js)
+```js
+const { openDb } = require('../config/database');
+
+class PerfilRepository {
+    /*
+     *  Inserir um novo registro na tabela
+     */
+    static async criar(dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "INSERT INTO auth_perfil (nome, descricao) " +
+              "VALUES (?, ?)",
+              [dados.nome, dados.descricao ]
+        );
+     
+        const novoDados = {
+            "id": retorno.lastID, 
+            "nome": dados.nome, 
+            "descricao": dados.descricao
+        };
+        
+        // Retorna o objeto recebido concatenado com o id gerado no banco
+        return retorno ? novoDados : null;
+    }
+
+    /*
+     *  Listar todos os registros da tabela
+     */
+    static async listarTodos() {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+              "SELECT * " +
+              "FROM auth_perfil " +
+			  "WHERE upper(nome) not like '%ADMIN%' " +
+              "ORDER BY id ASC"
+        );
+
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por ID
+     */
+    static async buscarPorId(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_perfil " +
+              "WHERE upper(nome) not like '%ADMIN%' " +
+              "AND id = ?",
+              [id]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por Unique
+     */
+    static async buscarPorNome(nome) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_perfil " +
+              "WHERE nome = ?",
+              [nome]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Atualizar um unico registro da tabela
+     */
+    static async atualizar(id, dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "UPDATE auth_perfil " +
+              "SET descricao = ? WHERE id = ?",
+              [dados.descricao, id]
+        );
+
+        return retorno;
+    }
+
+    /*
+     *  Excluir um unico registro da tabela
+     */
+    static async deletar(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "DELETE FROM auth_perfil " + 
+              "WHERE id = ?",
+              [id]
+        );
+
+        return retorno;
+    }
+}
+
+module.exports = PerfilRepository;
+```
+
+### Repository de Autorização (repositories/permissao.repository.js)
+```js
+const { openDb } = require('../config/database');
+
+class PermissaoRepository {
+    /*
+     *  Inserir um novo registro na tabela
+     */
+    static async criar(dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "INSERT INTO auth_permissao (regra, descricao) " + 
+              "VALUES (?, ?)",
+              [dados.regra, dados.descricao ]
+        );
+     
+        const novoDados = {
+            "id": retorno.lastID, 
+            "regra": dados.regra, 
+            "descricao": dados.descricao
+        };
+        
+        // Retorna o objeto recebido concatenado com o id gerado no banco
+        return retorno ? novoDados : null;
+    }
+
+    /*
+     *  Listar todos os registros da tabela
+     */
+    static async listarTodos() {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+              "SELECT * " +
+              "FROM auth_permissao " +
+              "WHERE upper(regra) not like '%ADMIN%' " + 
+              "ORDER BY id ASC"
+        );
+
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por ID
+     */
+    static async buscarPorId(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_permissao " +
+              "WHERE upper(regra) not like '%ADMIN%' " + 
+              "AND id = ?",
+              [id]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Buscar um unico registro por Unique
+     */
+    static async buscarPorNome(regra) {
+        const db = await openDb('base');
+
+        const retorno = await db.get(
+              "SELECT * " +
+              "FROM auth_permissao " +
+              "WHERE upper(regra) not like '%ADMIN%' " + 
+              "AND regra = ?",
+              [regra]
+        );
+        
+        return retorno || null;
+    }
+
+    /*
+     *  Atualizar um unico registro da tabela
+     */
+    static async atualizar(id, dados) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "UPDATE auth_permissao " + 
+              "SET descricao = ? WHERE id = ?",
+              [dados.descricao, id]
+        );
+
+        return retorno;
+    }
+
+    /*
+     *  Excluir um unico registro da tabela
+     */
+    static async deletar(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.run(
+              "DELETE FROM auth_permissao " + 
+              "WHERE id = ?",
+              [id]
+        );
+
+        return retorno;
+    }
+}
+
+module.exports = PermissaoRepository;
+```
+
+- Tabelas de Associação
+
+### Repository de Autorização (repositories/usuarioPerfil.repository.js)
+```js
+const { openDb } = require('../config/database');
+
+class UsuarioPerfisRepository {
+    /*
+     *  Lista os Perfis de um determinado usuario
+     *  id (number) - Id do Usuario
+     */
+    static async buscarPerfisPorUsuario(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+                "SELECT id_usuario, id_perfil " + 
+                "FROM auth_usuario_perfis " +
+                "WHERE upper(descricao) not like '%ADMIN%' " +
+                "AND id_usuario = ? " +
+                "ORDER BY id_perfil ASC",
+                [id]
+        );
+
+        return retorno || null;
+    }
+
+    /*
+     *  Inclui multiplos registros na tabela de associação Usuario e Perfil
+     *  id (number) - Id do Usuario
+     *  lista (array) - [[ idPerfil: , descricao: },...] 
+     */
+    static async criarPerfis(id, lista) {
+        const db = await openDb('base');
+        // if (list && list.length > 0) {   }
+
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+
+            // DELETE: Remove as associações anteriores do usuário
+            await db.run('DELETE FROM auth_usuario_perfis WHERE id_usuario = ?', [id]);
+
+            // INSERT: Se houver itens na lista, faz a inserção em lote (1 único comando)
+            // Cria os placeholders dinâmicos: "(?, ?, ?), (?, ?, ?), ..."
+            const placeholders = lista.map(() => '(?, ?, ?)').join(', ');
+            const sql = `INSERT INTO auth_usuario_perfis (id_usuario, id_perfil, descricao) VALUES ${placeholders}`;
+
+            // Achata a lista de parâmetros para corresponder aos '?'
+            const params = lista.flatMap(item => [id, item.idPerfil, item.descricao || null]);
+
+            await db.run(sql, params);
+
+            // Confirma as alterações
+            await db.run('COMMIT');
+
+            return { success: true, count: lista ? lista.length : 0 };
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
+    }
+}
+
+module.exports = UsuarioPerfisRepository;
+```
+
+### Repository de Autorização (repositories/perfilPermissoes.repository.js)
+```js
+const { openDb } = require('../config/database');
+
+class PerfilPermissoesRepository {
+    /*
+     *  Lista as Permissoes de um determinado Perfil
+     *  id (number) - Id do Perfil
+     */
+    static async buscarPermissoesPorPerfil(id) {
+        const db = await openDb('base');
+
+        const retorno = await db.all(
+                "SELECT id_perfil, id_permissao " +
+                "FROM auth_perfil_permissoes " +
+                "WHERE upper(descricao) not like '%ADMIN%' " +
+                "AND id_perfil = ? " +
+                "ORDER BY id_permissao ASC",
+                [id]
+        );
+
+        return retorno || null;
+    }
+  
+    /*
+     *  Incluir multiplos registros de associação de Perfil com Permissao
+     *  id (number) - Id do Perfil
+     *  list (array) - [{idPermissao: , descricao: },...]
+     */
+    static async criarPerfis(id, lista) {
+        const db = await openDb('base');
+
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+
+            // DELETE: Remove as associações anteriores do usuário
+            await db.run('DELETE FROM auth_perfil_permissoes WHERE id_perfil = ?', [id]);
+
+            // INSERT: Se houver itens na lista, faz a inserção em lote (1 único comando)
+            // Cria os placeholders dinâmicos: "(?, ?, ?), (?, ?, ?), ..."
+            const placeholders = lista.map(() => '(?, ?, ?)').join(', ');
+            const sql = `INSERT INTO auth_perfil_permissoes (id_perfil, id_permissao, descricao) VALUES ${placeholders}`;
+
+            // Achata a lista de parâmetros para corresponder aos '?'
+            const params = lista.flatMap(item => [id, item.idPermissao, item.descricao || null]);
+
+            await db.run(sql, params);
+
+            // Confirma as alterações
+            await db.run('COMMIT');
+
+            return { success: true, count: lista ? lista.length : 0 };
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
+    }
+}
+
+module.exports = PerfilPermissoesRepository;
+```
+
+---
+
+## Módulos do roteamento
+
+### Rotas de Autorização (routes/auth.route.js)
 ```js
 /*
  *
  */
 const express = require('express');
 const router = express.Router();
-const userService = require('../services/user.service');
+const { gerarToken } = require('../utils/token');
+
+// Importa os modelos
+const ApiResponse = require('../models/api.model');
+const AuthData = require('../models/auth.model');
+
+// Importa os servicos
+const AuthService = require('../services/auth.service');
 
 // ==========================================
 // ROTAS
 // ==========================================
 
-// ROTA [POST] - Criar Usuário (C)
-//      URL: 'api/users
-router.post('/', (req, res) => {
-    const novoUsuario = userService.criar(req.body);
-
-    res.status(201).json({
-            "message": "Usuário criado com sucesso",
-            "data": novoUsuario
-    });
-});
-
-// ROTA [GET] - Listar todos os Usuários (R)
-//      URL: 'api/users
-router.get('/', (req, res) => {
-    const usuarios = userService.listarTodos();
-
-    res.json({
-            "message": "Usuários listados com sucesso",
-            "data": usuarios
-    });
-});
-
-// ROTA [GET] - Buscar um usuário por ID (R)
-//      URL: 'api/users/id/1
-router.get('/id/:id', (req, res) => {
-    const usuario = userService.buscarPorId(req.params.id);
-
-    if (!usuario){
-        return res.status(404).json({
-                    "message": "Usuário não encontrado",
-                    "data": null
-                });
+/*
+ * Rota [POST] - Login que executa o procedimento
+ *      URL: 'api/auth/login
+ *      Body:   {
+ *                  email: usuario@dominio.com
+ *                  senha: senha
+ *              }
+ */
+router.post('/login', async (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Auth Login: Dados não informados."));
     }
 
-    res.json({
-            "message": "Usuário buscado com sucesso",
-            "data": usuario
-    });
-});
+    const { email, senha } = req.body;
+    let retorno = null;
 
-// ROTA [GET] - Buscar um usuário por Email (R)
-//      URL: 'api/users/email/usuario@email.com
-router.get('/email/:email', (req, res) => {
-    const usuario = userService.buscarPorEmail(req.params.email);
-
-    if (!usuario){
-        return res.status(404).json({
-                    "message": "Usuário não encontrado",
-                    "data": null
-                });
+    try {
+        retorno = await AuthService.buscarCredencial(email, senha)
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Auth Login: "+error.message, error.internalCode));
     }
 
-    res.json({
-            "message": "Usuário de email capturado com sucesso",
-            "data": usuario
+    // Se encontrou, prossegue com o Token
+    const tokenGenerated = gerarToken(retorno);
+
+    // Instancia o model passando os dados
+    const authData = new AuthData({
+                                email: email,
+                                nomeCompleto: retorno.nomeCompleto,
+                                telefone: retorno.telefone,
+                                token: tokenGenerated,
+                                permissoes: retorno.permissoes
     });
+
+    return res
+            .status(200)
+            .json(ApiResponse(true, "Auth Login: Executado com sucesso!", authData));
+
 });
 
-
-// ROTA [PUT] - Atualizar Usuário (U)
-//      URL: 'api/users/1
-router.put('/:id', (req, res) => {
-    const usuario = userService.atualizar(req.params.id, req.body);
-
-    if (!usuario){
-        return res.status(404).json({
-                                    "message": "Usuário não encontrado",
-                                    "data": null
-                });
+/*
+ * ROTA [PUT] - Atualizar Senha do Usuario (U)
+ *      URL: 'api/auth/reset/email
+ *      Params: (string) - Email do usuario
+ *      Body: {
+ *              'senha':
+ *          }
+ */
+router.put('/reset/:email', async (req, res) => {
+    if (!req.params.email) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Auth Reset: Parm(id) não foi informado."));
+    }
+    const email = req.params.email;
+    
+    // Validação simples de formato de e-mail (usando Regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if( !emailRegex.test(email) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Auth Reset: Parm(email) deve ser um e-mail válido."));
     }
 
-    res.json({
-            "message": "Usuário atualizado com sucesso",
-            "data": usuario
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Auth Reset: Body(dados) não foi informados."));
+    }
+
+    const { senha } = req.body;
+    let dados = null;
+
+    try {
+        await AuthService.atualizarSenha(email, senha);
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Auth Reset: "+error.message, error.internalCode));
+    }
+
+    try {
+        dados = await AuthService.buscarCredencial(email, senha)
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Auth Reset: "+error.message, error.internalCode));
+    }
+
+    // Gera um novo Token
+    const tokenGenerated = gerarToken(dados);
+
+    // Instancia o model passando os dados
+    const authData = new AuthData({
+                                email: email,
+                                nomeCompleto: dados.nomeCompleto,
+                                token: tokenGenerated,
+                                permissoes: dados.permissoes
     });
+
+    return res
+            .status(200)
+            .json(ApiResponse(true, "Auth Reset: Executado com sucesso!", authData));
 });
 
-// ROTA [DELETE] - Deletar Usuário (D)
-//      URL: 'api/users/1
-router.delete('/:id', (req, res) => {
-    const isDeletado = userService.deletar(req.params.id);
-    if (!isDeletado){
-        return res.status(404).json({
-                                    "message": "Usuário não encontrado",
-                                    "data": null
-        });
+/*
+ * Rota [POST] - Envio de email de Codigo de confirmação de alteracao
+ *      URL: 'api/auth/sendEmail
+ *      Body: {
+ *              "email": "kenio@gestao.com",
+ *              "codigo": "1234"
+ *            }
+ */
+router.post('/sendEmail', async (req, res) => {
+    // Se vazio/undefined, barramos o acesso
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Auth SendEmail: Dados não informados."));
     }
 
-    res.json({
-            "message": "Usuário removido com sucesso",
-            "data": null
-    });
-});
-
-// ROTA [GET] - Pesquisa a existencia do usuário com o e-mail informado (R)
-//      URL: 'api/users/exists?email=usuario@email.com'
-router.get('/exists', (req, res) => {
-    const { email } = req.query; // pega o parâmetro da query string
-
-    if (!email) {
-        return res.status(400).json({ error: 'Email é obrigatório' });
+    const { email, codigo } = req.body;
+    // Validação simples dos dados de entrada
+    if( !email || !codigo ){
+        return res
+                .status(401)
+                .json(ApiResponse(false, "Auth SendEmail: Faltam dados obrigatórios para o envio."));
     }
-    const exists = userService.checkEmailExists(email)
 
-    res.status(200).json({
-            "message": "Check Usuário com sucesso",
-            "data": {exists}
-    });
+    const assunto = "[Reset Password] - Verificação para troca de Password"
+    const texto = `
+Sr. Usuario.
+
+Este é um e-mail tem o código de validação para troca de senha.
+
+         Codigo: ${codigo}
+
+OBS.: Não responda este e-mail
+
+Equipe tecnica
+`
+    try {
+        const infoData = await AuthService.enviarEmail(email, assunto, texto);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Auth "+infoData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Auth "+error.message, error.internalCode));
+    }
+
 });
 
 module.exports = router;
+```
 
+### Rota de Usuários (routes/usuario.routes.js)
+```js
+/*
+ *
+ */
+const express = require('express');
+const router = express.Router();
+
+const ApiResponse = require('../models/api.model');
+
+const UsuarioService = require('../services/usuario.service');
+const UsuarioPerfisService = require('../services/usuarioPerfis.service');
+
+// ==========================================
+// ROTAS
+// ==========================================
+
+/*
+ * ROTA [POST] - Criar Usuário (C)
+ *      URL: 'api/usuario
+ *      Body: {
+ *              nomeCompleto:
+ *              email:
+ *              telefone:
+ *              senha:
+ *          }
+ */
+router.post('/', async (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Criar: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await UsuarioService.criar(req.body);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Usuário Criar: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Criar: "+error.message, null,error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [GET] - Listar todos os Usuários (R)
+ *      URL: 'api/usuario
+ */
+router.get('/', async (req, res) => {
+    try {
+        const listData = await UsuarioService.listarTodos();
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário ListarTodos: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário listarTodos: "+error.message,null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Buscar um usuário por ID (R)
+ *      URL: 'api/usuario/id/1
+ *      Params: (number) - id do registro na tabela
+ */
+router.get('/id/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário BuscarPorId: Parm(id) não foi informado."));
+    }
+
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário BuscarPorId: Parm(id) deve ser um numérico."));
+    }   
+
+    try {
+        const retorno = await UsuarioService.buscarPorId(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário BuscarPorId: Executado com sucesso!", retorno));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário BuscarPorId: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Buscar um usuário por Email (R)
+ *      URL: 'api/usuario/email/usuario@email.com
+ *      Params: (string) - email do usuario
+ */
+router.get('/email/:email', async (req, res) => {
+    if (!req.params.email) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário BuscarPorEmail: Parm(email) não foi informado."));
+    }
+    const email = req.params.email;
+    // Validação simples de formato de e-mail (usando Regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if( !emailRegex.test(email) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário BuscarPorEmail: Parm(email) deve ser um e-mail válido."));
+    }
+
+    try {
+        const retorno = await UsuarioService.buscarPorEmail(email);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário BuscarPorEmail: Executado com sucesso!", retorno));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário BuscarPorEmail: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [PUT] - Atualizar Usuário (U)
+ *      URL: 'api/usuario/1
+ *      Params: (number) - Id do registro de tabela
+ *      Body: {
+ *              'nomeCompleto': 
+ *              'telefone':
+ *          }
+ */
+router.put('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Atualizar: Parm(id) não foi informado."));
+    }
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Atualizar: Parm(id) deve ser um numérico."));
+    }   
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Atualizar: Body(dados) não foi informados."));
+    }
+    
+    try {
+        const retorno = await UsuarioService.atualizar(idParm, req.body);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário Atualizar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Atualizar: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [DELETE] - Deletar Usuário (D)
+ *      URL: 'api/usuario/1
+ *      Params: (number) - Id do registro da tabela
+ */
+router.delete('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Deletar: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Deletar: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const isDeletado = await UsuarioService.deletar(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário Deletar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Deletar: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Busca os associados Usuário e Perfis (R)
+ *      URL: 'api/usuario/perfis/1
+ *      Params: (number) - Id do registro na tabela (Usuario)
+ */
+router.get('/perfis/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const listData = await UsuarioPerfisService.buscarPerfisPorUsuario(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Usuário Associados: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Associados: "+error.message,null, error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [POST] - Criar associação de Usuário com Perfis(C)
+ *      URL: 'api/usuario/perfis/1
+ *      Params: (number) - Id do registro na tabela (Usuario)
+ *      Body: {
+ *              "lista": [{"idPerfil": "?", "descricao": "?????"},...]
+ *          }
+ */
+router.post('/perfis/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
+    }
+    
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Usuário Associados: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await UsuarioPerfisService.criarPerfis(idParm, req.body.lista);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Usuário Associados: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Usuário Associados: "+error.message, null,error.internalCode));
+    }
+
+});
+
+module.exports = router;
+```
+
+### Rota de Usuários (routes/perfil.routes.js)
+```js
+/*
+ *
+ */
+const express = require('express');
+const router = express.Router();
+
+const ApiResponse = require('../models/api.model');
+
+const PerfilService = require('../services/perfil.service');
+const PerfilPermissoesService = require('../services/perfilPermissoes.service');
+
+// ==========================================
+// ROTAS
+// ==========================================
+
+/*
+ * ROTA [POST] - Criar Perfil (C)
+ *      URL: 'api/perfil
+ *      Body: {
+ *              nome:
+ *              descricao:
+ *          }
+ */
+router.post('/', async (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Criar: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await PerfilService.criar(req.body);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Perfil Criar: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil Criar: "+error.message, null,error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [GET] - Listar todos os Perfis (R)
+ *      URL: 'api/perfil
+ */
+router.get('/', async (req, res) => {
+    try {
+        const listData = await PerfilService.listarTodos();
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil ListarTodos: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil listarTodos: "+error.message,null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Buscar um Perfil por ID (R)
+ *      URL: 'api/perfil/id/1
+ *      Params: (number) - id do registro na tabela
+ */
+router.get('/id/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil BuscarPorId: Parm(id) não foi informado."));
+    }
+
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Perfil BuscarPorId: Parm(id) deve ser um numérico."));
+    }   
+
+    try {
+        const retorno = await PerfilService.buscarPorId(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil BuscarPorId: Executado com sucesso!", retorno));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil BuscarPorId: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Buscar um Perfil por Email (R)
+ *      URL: 'api/perfil/nome/Gerente
+ *      Params: (string) - Nome do perfil (UNIQUE)
+ */
+router.get('/nome/:nome', async (req, res) => {
+    if (!req.params.nome) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil BuscarPorNome: Parm(nome) não foi informado."));
+    }
+
+    try {
+        const retorno = await PerfilService.buscarPorNome(nome);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil BuscarPorNome: Executado com sucesso!", retorno));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil BuscarPorNome: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [PUT] - Atualizar Perfil (U)
+ *      URL: 'api/perfil/1
+ *      Params: (number) - Id do registro na tabela
+ *      Body: {
+ *              'descricao':
+ *          }
+ */
+router.put('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Atualizar: Parm(id) não foi informado."));
+    }
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Perfil Atualizar: Parm(id) deve ser um numérico."));
+    }   
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Atualizar: Body(dados) não foi informados."));
+    }
+    
+    try {
+        const retorno = await PerfilService.atualizar(idParm, req.body);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil Atualizar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil Atualizar: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [DELETE] - Deletar Perfil (D)
+ *      URL: 'api/perfil/1
+ *      Params: (number) - Id do registro na tabela
+ */
+router.delete('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Deletar: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Perfil Deletar: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const isDeletado = await PerfilService.deletar(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil Deletar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil Deletar: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Busca os associados Perfil com Permissoes (R)
+ *      URL: 'api/perfil/permissoes/1
+ *      Params: (number) - Id do registro na tabela (Perfil)
+ */
+router.get('/permissoes/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Perfil Associados: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const listData = await PerfilPermissoesService.buscarPermissoesPorPerfil(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Perfil Associados: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil Associados: "+error.message,null, error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [POST] - Criar associação de Perfil com Permissões (C)
+ *      URL: 'api/perfil/permissoes/1
+ *      Params: (number) - Id do registro na tabela (Perfil)
+ *      Body: {
+                "lista": [{"idPermissao": "?", "descricao": "?????"},...]
+ *          }
+ */
+router.post('/permissoes/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Associados: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Perfil Associados: Parm(id) deve ser um numérico."));
+    }
+    
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Perfil Associados: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await PerfilPermissoesService.criarPermissoes(idParm, req.body.lista);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Perfil Associados: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Perfil Associados: "+error.message, null,error.internalCode));
+    }
+
+});
+
+module.exports = router;
+```
+
+### Rota de Usuários (routes/permissao.routes.js)
+```js
+/*
+ *
+ */
+const express = require('express');
+const router = express.Router();
+
+const ApiResponse = require('../models/api.model');
+
+const PermissaoService = require('../services/permissao.service');
+
+// ==========================================
+// ROTAS
+// ==========================================
+
+/*
+ * ROTA [POST] - Criar Permissao (C)
+ *      URL: 'api/permissao
+ *      Body: {
+ *              regra:
+ *              descricao:
+ *          }
+ */
+router.post('/', async (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Permissão Criar: Dados não informados."));
+    }
+
+    try {
+        const novoDados = await PermissaoService.criar(req.body);
+        return res
+                .status(201)
+                .json(ApiResponse(true, "Permissão Criar: Executado com sucesso!", novoDados));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Permissão Criar: "+error.message, null,error.internalCode));
+    }
+
+});
+
+/*
+ * ROTA [GET] - Listar todos as Permissões (R)
+ *      URL: 'api/permissao
+ */
+router.get('/', async (req, res) => {
+    try {
+        const listData = await PermissaoService.listarTodos();
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Permissão ListarTodos: Listados com sucesso!", listData));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Permissão listarTodos: "+error.message,null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [GET] - Buscar um Permissao por ID (R)
+ *      URL: 'api/permissao/id/1
+ *      Params: (number) - id do registro na tabela
+ */
+router.get('/id/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Permissão BuscarPorId: Parm(id) não foi informado."));
+    }
+
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Permissão BuscarPorId: Parm(id) deve ser um numérico."));
+    }   
+
+    try {
+        const retorno = await PermissaoService.buscarPorId(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Permissão BuscarPorId: Executado com sucesso!", retorno));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Permissão BuscarPorId: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [PUT] - Atualizar Permissao (U)
+ *      URL: 'api/permissao/1
+ *      Params: (number) - Id do registro na tabela
+ *      Body: {
+ *              'descricao':
+ *          }
+ */
+router.put('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Permissão Atualizar: Parm(id) não foi informado."));
+    }
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Permissão Atualizar: Parm(id) deve ser um numérico."));
+    }   
+
+    if (!req.body || Object.keys(req.body).length === 0) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Permissão Atualizar: Body(dados) não foi informados."));
+    }
+    
+    try {
+        const retorno = await PermissaoService.atualizar(idParm, req.body);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Permissão Atualizar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Permissao Atualizar: "+error.message, null, error.internalCode));
+    }
+});
+
+/*
+ * ROTA [DELETE] - Deletar Permissão (D)
+ *      URL: 'api/permissao/1
+ *      Params: (number) - Id do registro na tabela
+ */
+router.delete('/:id', async (req, res) => {
+    if (!req.params.id) {
+        return res
+                .status(400) 
+                .json(ApiResponse(false, "Permissão Deletar: Parm(id) não foi informado."));
+    }
+    
+    const idParm = Number(req.params.id);
+    if( isNaN(idParm) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Permissão Deletar: Parm(id) deve ser um numérico."));
+    }
+
+    try {
+        const isDeletado = await PermissaoService.deletar(idParm);
+        return res
+                .status(200)
+                .json(ApiResponse(true, "Permissão Deletar: Executado com sucesso!"));
+    } catch (error) {
+        const status = error.statusCode || 500
+        return res
+                .status(status)
+                .json(ApiResponse(false, "Permissão Deletar: "+error.message, null, error.internalCode));
+    }
+});
+
+module.exports = router;
 ```
 
 ## Rota de relatórios (routes/reports.route.js)
@@ -655,89 +1907,89 @@ module.exports = router;
  */
 require('dotenv').config();
 const express = require('express');
-const nodemailer = require('nodemailer'); 
- 
-// MOCK - Simulação da base de dados
-let bancoDeDadosUsuarios = [
-  {
-    "id": 1,
-    "email": "keniodesouza@gmail.com",
-    "nomeCompleto": "Kênio de Souza",
-    "telefone": "(62) 98294-1012",
-    "senha": "123456",
-    "permissoes": ["admin:access", "usuario:read", "usuario:create", "usuario:update"]
-  },
-  {
-    "id": 2,
-    "email": "normadeoliveira@gmail.com",
-    "nomeCompleto": "Norma de Oliveira",
-    "telefone": "(62) 98282-1012",
-    "senha": "456789",
-    "permissoes": ["pessoa:read"]
-  }
-];
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+
+const AppError = require('../utils/AppError');
+const UsuarioRepository = require('../repositories/usuario.repository');
 
 const app = express();
 app.use(express.json()); // Permite que o Express leia JSON no corpo das requisições
 
-// Configuração do transportador do Nodemailer (Docker) Mailpit
+// Configuração do transportador do Nodemailer (Docker)
 const transporter_local = nodemailer.createTransport({
-	host: process.env.EMAIL_HOST,
-	port: process.env.EMAIL_PORT,
-	secure: false, // Não precisa de SSL/TLS para teste local
-	auth: null     // Mailpit não exige autenticação por padrão
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false, // Não precisa de SSL/TLS para teste local
+    auth: null     // Mailpit não exige autenticação por padrão
 });
 
 // Configuração do transportador do Nodemailer (Gmail)
 const transporter_server = nodemailer.createTransport({
-	host: process.env.EMAIL_HOST,
-	port: process.env.EMAIL_PORT,
-	secure: false, // true para porta 465, false para outras portas (como 587)
-	auth: {
-		user: process.env.EMAIL_USER,
-		pass: process.env.EMAIL_PASS,
-	},
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    secure: false, // true para porta 465, false para outras portas (como 587)
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
 });
 
-const authService = {
-    // [READ] - Procedimento para buscar toda as lista de usuarios
-    buscarTodos: () => {
-        return bancoDeDadosUsuarios;
-    },
+class AuthService {
+    /*
+     *  [READ] - Busca as credenciais de Autorização:
+     *      @param {string} - email 
+     *      @param {string} - senha
+     */
+    static async buscarCredencial(email, senha){
+        const list = await UsuarioRepository.buscarCredencialPorEmail(email);
+        if (!list || list.length === 0) {
+            throw new AppError("Credencial não localizada", 2001, 404);
+        }
 
-    // [READ by Email] - Procedimento para buscar um único usuário por Email
-    buscarPorCredencial: (emailPesquisa) => {
-        // Esse procedimento isola a lógica de busca.
-        // Se no futuro você usar MySQL, MongoDB, etc., só precisará mudar este bloco.
-        return bancoDeDadosUsuarios.find(
-            (user) => user.email === emailPesquisa
-        );
-    },
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha // await bcrypt.hash(senha, 10);
 
-    // [Validation] - Procedimento verifica se senha esta correta
-    isSenhaValida: (emailPesquisa, senhaPesquisa) => {
-        return bancoDeDadosUsuarios.some(
-            (user) => user.email === emailPesquisa && user.senha === senhaPesquisa
-        );
-    },
+        if( list[0].senha != senhaCrypt ){
+            throw new AppError("Senha esta invalida.", 2002, 404);
+        }
 
-    // [UPDATE by Email] - Procedimento atualização de nova senha
-    atualizarSenha: (emailParm, novaSenhaParm) => {
-        const indice = bancoDeDadosUsuarios.findIndex(user => user.email === emailParm);
-
-        if (indice === -1) return null; // Usuário não encontrado
-
-        // Mescla os dados antigos com os novos que foram enviados
-        bancoDeDadosUsuarios[indice] = {
-                                        ...bancoDeDadosUsuarios[indice],
-                                            senha: novaSenhaParm || bancoDeDadosUsuarios[indice].senha
+        const retorno = {
+            id: list[0].id,
+            email: email,
+            nomeCompleto: list[0].nomeCompleto,
+            telefone: list[0].telefone,
+            senha: list[0].senha,
+            permissoes: list.map(item => item.regra) // Extrai todas as regras num array simples
         };
 
-        return bancoDeDadosUsuarios[indice];
-    },
+        return retorno;
+    }
+    
+    /*
+     *  [UPDATE] - Método atualiza a senha do usuario
+     *      @param {string} - email 
+     *      @param {string} - senha
+     */
+    static async atualizarSenha(email, senha ){
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha // await bcrypt.hash(senha, 10);
 
-    // [NODEMAILER] - Procedimento envio de email para servidor
-    enviarEmail: async (para, assunto, texto) => {
+        const result = await UsuarioRepository.resetPassword(email, senhaCrypt)
+        if( !result || result.changes == 0 ){
+            throw new AppError("Usuário não modou a Senha", 2003, 404);
+        }
+
+        return null;
+    }
+
+    /*
+     * [NODEMAILER] - Procedimento envio de email para servidor
+     *      @param {string} para    - Destinatário para a mensagem
+     *      @param {string} Assunto - Descrição resumido do email
+     *      @param {string} texto   - Texto de composicao do email
+     */
+    static async enviarEmail(para, assunto, texto){
         try {
             // Envia o e-mail
             const info = await transporter_local.sendMail({
@@ -750,122 +2002,361 @@ const authService = {
             return 'sendMail: Enviado com sucesso. messageId:' + info.messageId;
 
         } catch(error) {
-            return 'sendMail: Erro ao enviar e-mail. Error:' + error;
+            throw new AppError("sendMail: Erro ao enviar e-mail. Error:"+error, 2004, 404);
         }
-    },
-
+    }
 };
 
-module.exports = authService;
-
+module.exports = AuthService;
 ```
 
-### Servicos de Usuário (services/user.service.js)
+### Servicos de Usuário (services/usuario.service.js)
 ```js
 /*
  *
  */
-// MOCK - Simulação da tabela/coleção de Usuários na base de dados
-let bancoDeDadosUsuarios = [
-  {
-    "id": 1,
-    "email": "keniodesouza@gmail.com",
-    "nomeCompleto": "Kênio de Souza",
-    "telefone": "(62) 98294-1012",
-    "senha": "123456",
-    "permissoes": ["user:access", "user:read", "user:create"]
-  }
-];
+const bcrypt = require('bcrypt');
+const AppError = require('../utils/AppError');
 
-const userService = {
-  
+const UsuarioRepository = require('../repositories/usuario.repository');
+
+class UsuarioService {
+
     // [CREATE] - Procedimento para criar um novo usuário
-    criar: (dados) => {
-        // Contador para simular IDs autoincrementais do banco de dados
-        let proximoId = bancoDeDadosUsuarios.length;
+    static async criar(dados){
+        const senha = dados.senha || 'Senha@123'
 
-        const novoUsuario = {
-                id: proximoId++,
-                email: dados.email,
-                nomeCompleto: dados.nomeCompleto,
-                telefone: dados.telefone,
-                senha: dados.senha || "Senha@123", // senha padrão caso não seja enviada
-                permissoes: ["pessao:access"] // permissão padrão inicial
+        // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
+        const senhaCrypt = senha; // await bcrypt.hash(senha, 10);
+
+        const usuarioData = {
+              nomeCompleto: dados.nomeCompleto,
+              email: dados.email,
+              telefone: dados.telefone || '(99) 99999-9999',
+              senha: senhaCrypt
         };
-    
-        bancoDeDadosUsuarios.push(novoUsuario);
-        return novoUsuario;
-    },
+
+        const newData = await UsuarioRepository.criar(usuarioData);
+        if (!newData) {
+            // Provoca o erro numerado: (mensagem, codigoInterno, httpStatus)
+            throw new AppError("Usuário não localizado no sistema", 2001, 404);
+        }
+
+        return newData;
+    }
 
     // [READ] - Procedimento para listar todos os usuários
-    listarTodos: () => {
-        return bancoDeDadosUsuarios;
-    },
+    static async listarTodos(){
+        const retorno = await UsuarioRepository.listarTodos();
+        if (!retorno) {
+            throw new AppError("Lista de usuarios esta vazia", 2002, 404);
+        }
 
-    // [READ by ID] - Procedimento para buscar um único usuário pelo ID
-    buscarPorId: (id) => {
-        return bancoDeDadosUsuarios.find(user => user.id === parseInt(id));
-    },
+        return retorno;
+    }
 
-    // [READ by Email] - O procedimento de busca que usamos para o login
-    buscarPorEmail: (email) => {
-        return bancoDeDadosUsuarios.find(user => user.email.toLowerCase() === email.toLowerCase());
-    },
+    // [READ by ID] - Procedimento para buscar um único usuário por ID
+    static async buscarPorId(id){
+        const retorno = await UsuarioRepository.buscarPorId(id);
+        if (!retorno) {
+            throw new AppError("Usuário não localizado no sistema", 2003, 404);
+        }
+
+        return retorno
+    }
+
+    // [READ by Email] - Procedimento para buscar um único usuário por Email 
+    static async buscarPorEmail(email){
+        const retorno = await UsuarioRepository.buscarPorEmail(email);
+        if (!retorno) {
+            throw new AppError("Usuário não localizado no sistema", 2004, 404);
+        }
+        return retorno;
+    }
 
     // [UPDATE] - Procedimento para atualizar os dados de um usuário
-    atualizar: (id, dadosAtualizados) => {
-        const indice = bancoDeDadosUsuarios.findIndex(user => user.id === parseInt(id));
-    
-        if (indice === -1) return null; // Usuário não encontrado
+    static async atualizar(id, dados){
+        const retorno = await UsuarioRepository.atualizar(id, dados)
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("Usuário não atualizado no sistema", 2005, 404);
+        }
 
-        // Mescla os dados antigos com os novos que foram enviados
-        bancoDeDadosUsuarios[indice] = {
-                                        ...bancoDeDadosUsuarios[indice],
-                                                nomeCompleto: dadosAtualizados.nomeCompleto || bancoDeDadosUsuarios[indice].nomeCompleto,
-                                                telefone: dadosAtualizados.telefone || bancoDeDadosUsuarios[indice].telefone
-                                        };
-
-        return bancoDeDadosUsuarios[indice];
-    },
+        return null;
+    }
 
     // [DELETE] - Procedimento para remover um usuário
-    deletar: (id) => {
-        const indice = bancoDeDadosUsuarios.findIndex(user => user.id === parseInt(id));
-    
-        if (indice === -1) return false;
+    static async deletar(id){
+        const retorno = await UsuarioRepository.deletar(id);
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("Usuário não foi excluido do sistema", 2007, 404);
+        }
 
-        bancoDeDadosUsuarios.splice(indice, 1); // Remove do array
-        return true;
-    },
-    
-    // [READ] - Método que simula a rota 'users/exists?email=usuario@email.com'
-    checkEmailExists: (email) => {
-        // Procuramos se existe algum usuário na lista com o e-mail informado
-        // O método .some() retorna true se encontrar, ou false se não encontrar
-        const existe = bancoDeDadosUsuarios.some(user => user.email.toLowerCase() === email.toLowerCase());
-
-        // Retornamos esse booleano "envelopado" em um Observable (simulando a resposta do HttpClient)
-        return existe;
-    },
-
-    // [UPDATE] - Método atualiza a senha do usuario
-    atualizarSenha: (email, senha ) => {
-        // Procuramos se existe algum usuário na lista com o e-mail informado
-        const index = bancoDeDadosUsuarios.findIndex(user => user.email.toLowerCase() === email.toLowerCase());
-        if (index === -1) return false;
-
-        // Mescla os dados antigos com a senha nova
-        bancoDeDadosUsuarios[index] = {
-                                        ...bancoDeDadosUsuarios[index],
-                                                senha: senha || bancoDeDadosUsuarios[index].senha
-                                        };
-
-        return bancoDeDadosUsuarios[index];
+        return null;
     }
-};
+}
 
-module.exports = userService;
+module.exports = UsuarioService;
+```
 
+### Servicos de Perfil (services/perfil.service.js)
+```js
+/*
+ *
+ */
+const AppError = require('../utils/AppError');
+const PerfilRepository = require('../repositories/perfil.repository');
+
+class PerfilService {
+
+    // [CREATE] - Procedimento para criar um novo perfil
+    static async criar(dados){
+        const localData = {
+              nome: dados.nome,
+              descricao: dados.descricao
+        };
+
+        const newData = await PerfilRepository.criar(localData);
+        if (!newData) {
+            // Provoca o erro numerado: (mensagem, codigoInterno, httpStatus)
+            throw new AppError("Perfil não criado no sistema", 2001, 404);
+        }
+
+        return newData;
+    }
+
+    // [READ] - Procedimento para listar todos os perfils
+    static async listarTodos(){
+        const retorno = await PerfilRepository.listarTodos();
+        if (!retorno) {
+            throw new AppError("Lista de perfil esta vazia", 2002, 404);
+        }
+
+        return retorno;
+    }
+
+    // [READ by ID] - Procedimento para buscar um único perfil por ID
+    static async buscarPorId(id){
+        const retorno = await PerfilRepository.buscarPorId(id);
+        if (!retorno) {
+            throw new AppError("perfil não localizado no sistema", 2003, 404);
+        }
+
+        return retorno
+    }
+
+    // [READ by NOME] - Procedimento para buscar um único perfil por NOME
+    static async buscarPorNome(nome){
+        const retorno = await PerfilRepository.buscarPorNome(nome);
+        if (!retorno) {
+            throw new AppError("perfil não localizado no sistema", 2004, 404);
+        }
+        return retorno;
+    }
+
+    // [UPDATE] - Procedimento para atualizar os dados de um perfil
+    static async atualizar(id, dados){
+        const retorno = await PerfilRepository.atualizar(id, dados)
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("perfil não atualizado no sistema", 2005, 404);
+        }
+
+        return null;
+    }
+
+    // [DELETE] - Procedimento para remover um perfil
+    static async deletar(id){
+        const retorno = await PerfilRepository.deletar(id);
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("perfil não foi excluido do sistema", 2007, 404);
+        }
+
+        return null;
+    }
+}
+
+module.exports = PerfilService;
+```
+
+### Servicos de Permissao (services/permissao.service.js)
+```js
+/*
+ *
+ */
+const AppError = require('../utils/AppError');
+const PermissaoRepository = require('../repositories/permissao.repository');
+
+class PermissaoService {
+
+    // [CREATE] - Procedimento para criar um novo permissao
+    static async criar(dados){
+        const localData = {
+              regra: dados.regra,
+              descricao: dados.descricao
+        };
+
+        const newData = await PermissaoRepository.criar(localData);
+        if (!newData) {
+            // Provoca o erro numerado: (mensagem, codigoInterno, httpStatus)
+            throw new AppError("permissão não criado no sistema", 2001, 404);
+        }
+
+        return newData;
+    }
+
+    // [READ] - Procedimento para listar todos os permissaos
+    static async listarTodos(){
+        const retorno = await PermissaoRepository.listarTodos();
+        if (!retorno) {
+            throw new AppError("Lista de permissões esta vazia", 2002, 404);
+        }
+
+        return retorno;
+    }
+
+    // [READ by ID] - Procedimento para buscar um único permissao por ID
+    static async buscarPorId(id){
+        const retorno = await PermissaoRepository.buscarPorId(id);
+        if (!retorno) {
+            throw new AppError("permissão não localizado no sistema", 2003, 404);
+        }
+
+        return retorno
+    }
+
+    // [READ by NOME] - Procedimento para buscar um único permissao por NOME
+    static async buscarPorNome(regra){
+        const retorno = await PermissaoRepository.buscarPorNome(regra);
+        if (!retorno) {
+            throw new AppError("permissão não localizado no sistema", 2004, 404);
+        }
+        return retorno;
+    }
+
+    // [UPDATE] - Procedimento para atualizar os dados de um permissao
+    static async atualizar(id, dados){
+        const retorno = await PermissaoRepository.atualizar(id, dados)
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("permissão não atualizado no sistema", 2005, 404);
+        }
+
+        return null;
+    }
+
+    // [DELETE] - Procedimento para remover um permissao
+    static async deletar(id){
+        const retorno = await PermissaoRepository.deletar(id);
+        if( !retorno || retorno.changes == 0 ){
+            throw new AppError("permissão não foi excluido do sistema", 2007, 404);
+        }
+
+        return null;
+    }
+}
+
+module.exports = PermissaoService;
+```
+
+### Servicos de Associado Usuário com Perfis (services/usuarioPerfil.service.js)
+```js
+/*
+ *
+ */
+const AppError = require('../utils/AppError');
+
+const UsuarioRepository = require('../repositories/usuario.repository');
+const PerfilRepository = require('../repositories/perfil.repository');
+const UsuarioPerfisRepository = require('../repositories/usuarioPerfis.repository');
+
+class UsuarioPerfisService {
+
+    // [CREATE] - Procedimento associar usuario ao perfil
+    static async criarPerfis(id, lista){
+        const retorno = await UsuarioPerfisRepository.criarPerfis(id, lista);
+
+        return null;
+    }
+
+    // [READ] - Procedimento para listar todos os perfis por Usuario(id)
+    static async buscarPerfisPorUsuario(id){
+        const retorno = await UsuarioRepository.buscarPorId(id);
+        if (!retorno) {
+            throw new AppError("Usuário não existe", 2001, 404);
+        }
+        const { senha, ...usuario } = retorno;
+
+        const list1 = await UsuarioPerfisRepository.buscarPerfisPorUsuario(id);
+        if (!list1) {
+            throw new AppError("Lista de associação de Perfis esta vazia", 2002, 404);
+        }
+
+        // Criamos um Set com os IDs presentes na list1 para busca rápida O(1)
+        const idsList1 = new Set(list1.map(item => item.id_perfil));
+
+        const list2 = await PerfilRepository.listarTodos();
+        if (!list2) {
+            throw new AppError("Lista de perfil esta vazia", 2002, 404);
+        }
+
+        // Mapeamos a list2 adicionando a propriedade 'isConectado' para true/false
+        const listResult = list2.map(item => ({...item, isConectado: idsList1.has(item.id)}));
+
+        return { usuario: usuario, perfis: listResult } || null;
+    }
+
+}
+
+module.exports = UsuarioPerfisService;
+```
+
+
+### Servicos de Associado Perfil com Permissoes (services/perfilPermissoes.service.js)
+```js
+/*
+ *
+ */
+const AppError = require('../utils/AppError');
+
+const PerfilRepository = require('../repositories/perfil.repository');
+const PermissaoRepository = require('../repositories/permissao.repository');
+const PerfilPermissoesRepository = require('../repositories/perfilPermissoes.repository');
+
+class PerfilPermissoesService {
+
+    // [CREATE] - Procedimento de associar perfil a permissoes
+    static async criarPermissoes(id, lista){
+        const retorno = await PerfilPermissoesRepository.criarPerfis(id, lista);
+
+        return null;
+    }
+
+    // [READ] - Procedimento de listar associacoes de perfil com permissões
+    static async buscarPermissoesPorPerfil(id){
+        const retorno = await PerfilRepository.buscarPorId(id);
+        if (!retorno) {
+            throw new AppError("Perfil não existe", 2001, 404);
+        }
+
+        const list1 = await PerfilPermissoesRepository.buscarPermissoesPorPerfil(id);
+        if (!list1) {
+            throw new AppError("Lista de Permissões esta vazia", 2002, 404);
+        }
+
+        // Criamos um Set com os IDs presentes na list1 para busca rápida O(1)
+        const idsList1 = new Set(list1.map(item => item.id_permissao));
+        const list2 = await PermissaoRepository.listarTodos();
+        if (!list2) {
+            throw new AppError("Lista de associação de Perfils esta vazia", 2002, 404);
+        }
+        
+        // Mapeamos a list2 adicionando a propriedade 'isConectado' para true/false
+        const listResult = list2.map(item => ({...item, isConectado: idsList1.has(item.id)}));
+
+        return { perfil: retorno, permissoes: listResult } || null;
+    }
+
+}
+
+module.exports = PerfilPermissoesService;
 ```
 
 ## Serviços de relatórios (services/reports.service.js)
@@ -946,7 +2437,6 @@ const reportService = {
 };
 
 module.exports = reportService;
-
 ```
 
 ----
@@ -955,12 +2445,14 @@ module.exports = reportService;
 
 ### Manipulação de Erros (utils/appError.js)
 ```js
-// src/utils/AppError.js
+/*
+ * AppError - Tratamento de Erros 
+ */
 class AppError extends Error {
-    constructor(message, internalCode, statusCode = 500) {
+    constructor(message, internalCode = null, statusCode = 500) {
         super(message);
-        this.statusCode = statusCode; // Ex: 400, 404, 500
-        this.internalCode = internalCode; // Ex: 1001, 1002
+        this.statusCode = statusCode;       // Ex: 400, 404, 500
+        this.internalCode = internalCode;   // Ex: 1001, 1002
     }
 }
 
@@ -970,11 +2462,11 @@ module.exports = AppError;
 ### Utilitário para tratamento de Token (utils/token.js)
 ```js
 /*
- * 
+ *  Gera o token para sessão
  */
 const jwt = require('jsonwebtoken');
 
-// Chave secreta que APENAS o seu servidor deve saber.
+// Chave secreta que APENAS o seu servidor deve saber. 
 // No mundo real, guarde isso em um arquivo .env
 // node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 const SECRET_KEY = "MinhaFraseSecretaSuperProtegida_2026#TokenJWT!";
@@ -989,7 +2481,7 @@ function gerarToken(data) {
   const payload = {
     id: data.id,
     email: data.email,
-    role: data.password || 'passwrd'
+    role: data.senha || 'passwrd'
   };
 
   // Opções do token (como tempo de expiração)
@@ -1002,7 +2494,6 @@ function gerarToken(data) {
 }
 
 module.exports = { gerarToken };
-
 ```
 
 ---

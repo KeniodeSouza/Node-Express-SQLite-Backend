@@ -2,7 +2,8 @@ const { openDb } = require('../config/database');
 
 class PerfilPermissoesRepository {
     /*
-     *  Buscar as Permissoes por id do Perfil
+     *  Lista as Permissoes de um determinado Perfil
+     *  id (number) - Id do Perfil
      */
     static async buscarPermissoesPorPerfil(id) {
         const db = await openDb('base');
