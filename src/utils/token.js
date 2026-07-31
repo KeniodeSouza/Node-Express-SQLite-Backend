@@ -16,9 +16,9 @@ const SECRET_KEY = "MinhaFraseSecretaSuperProtegida_2026#TokenJWT!";
 function gerarToken(data) {
   // Dados que você quer que fiquem guardados dentro do token
   const payload = {
-    id: data.id,
+    id: data.id || '1',
     email: data.email,
-    role: data.senha || 'passwrd'
+    role: data.role || 'passwrd'
   };
 
   // Opções do token (como tempo de expiração)

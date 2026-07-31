@@ -54,7 +54,6 @@ class AuthService {
             email: email,
             nomeCompleto: list[0].nomeCompleto,
             telefone: list[0].telefone,
-            senha: list[0].senha,
             permissoes: list.map(item => item.regra) // Extrai todas as regras num array simples
         };
 
@@ -70,12 +69,12 @@ class AuthService {
         // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
         const senhaCrypt = senha // await bcrypt.hash(senha, 10);
 
-        const result = await UsuarioRepository.resetPassword(email, senhaCrypt)
-        if( !result || result.changes == 0 ){
+        const retorno = await UsuarioRepository.resetPassword(email, senhaCrypt)
+        if( !result ){
             throw new AppError("Usuário não modou a Senha", 2003, 404);
         }
 
-        return null;
+        return retorno;
     }
 
     /*

@@ -20,8 +20,8 @@ const AuthService = require('../services/auth.service');
  * Rota [POST] - Login que executa o procedimento
  *      URL: 'api/auth/login
  *      Body:   {
- *                  email: usuario@dominio.com
- *                  senha: senha
+ *                  'email': 
+ *                  'senha': 
  *              }
  */
 router.post('/login', async (req, res) => {
@@ -32,6 +32,21 @@ router.post('/login', async (req, res) => {
     }
 
     const { email, senha } = req.body;
+
+    if( !email || !senha ){
+        return res
+                .status(401)
+                .json(ApiResponse(false, "Auth Login: Faltam dados obrigatórios."));
+    }
+
+    // Validação simples de formato de e-mail (usando Regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if( !emailRegex.test(email) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Auth Login: email deve ser um e-mail válido."));
+    }
+
     let retorno = null;
 
     try {
@@ -43,8 +58,13 @@ router.post('/login', async (req, res) => {
                 .json(ApiResponse(false, "Auth Login: "+error.message, error.internalCode));
     }
 
-    // Se encontrou, prossegue com o Token
-    const tokenGenerated = gerarToken(retorno);
+    // Gera um Token para session
+    const tokenData = {
+            id: retorno.id || null,
+            email: email,
+            role: senha
+        };
+    const tokenGenerated = gerarToken(tokenData);
 
     // Instancia o model passando os dados
     const authData = new AuthData({
@@ -63,20 +83,27 @@ router.post('/login', async (req, res) => {
 
 /*
  * ROTA [PUT] - Atualizar Senha do Usuario (U)
- *      URL: 'api/auth/reset/email
- *      Params: (string) - Email do usuario
+ *      URL:  'api/auth/reset'
  *      Body: {
+ *              'email':
  *              'senha':
- *          }
+ *           }
  */
-router.put('/reset/:email', async (req, res) => {
-    if (!req.params.email) {
+router.put('/reset', async (req, res) => {
+    if (!req.body || Object.keys(req.body).length === 0) {
         return res
                 .status(400) 
-                .json(ApiResponse(false, "Auth Reset: Parm(id) não foi informado."));
+                .json(ApiResponse(false, "Auth Reset: Body(dados) não foi informados."));
     }
-    const email = req.params.email;
+
+    const { email, senha } = req.body;
     
+    if( !email || !senha ){
+        return res
+                .status(401)
+                .json(ApiResponse(false, "Auth Reset: Faltam dados obrigatórios."));
+    }
+
     // Validação simples de formato de e-mail (usando Regex)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if( !emailRegex.test(email) ){
@@ -85,26 +112,10 @@ router.put('/reset/:email', async (req, res) => {
                 .json(ApiResponse(false, "Auth Reset: Parm(email) deve ser um e-mail válido."));
     }
 
-    if (!req.body || Object.keys(req.body).length === 0) {
-        return res
-                .status(400) 
-                .json(ApiResponse(false, "Auth Reset: Body(dados) não foi informados."));
-    }
-
-    const { senha } = req.body;
-    let dados = null;
+    let retorno = null;
 
     try {
-        await AuthService.atualizarSenha(email, senha);
-    } catch (error) {
-        const status = error.statusCode || 500
-        return res
-                .status(status)
-                .json(ApiResponse(false, "Auth Reset: "+error.message, error.internalCode));
-    }
-
-    try {
-        dados = await AuthService.buscarCredencial(email, senha)
+        retorno = await AuthService.atualizarSenha(email, senha);
     } catch (error) {
         const status = error.statusCode || 500
         return res
@@ -113,14 +124,19 @@ router.put('/reset/:email', async (req, res) => {
     }
 
     // Gera um novo Token
-    const tokenGenerated = gerarToken(dados);
+    const tokenData = {
+            id: retorno.id || null,
+            email: email,
+            role: senha
+        };
+    const tokenGenerated = gerarToken(tokenData);
 
     // Instancia o model passando os dados
     const authData = new AuthData({
                                 email: email,
-                                nomeCompleto: dados.nomeCompleto,
+                                nomeCompleto: retorno.nomeCompleto,
                                 token: tokenGenerated,
-                                permissoes: dados.permissoes
+                                permissoes: retorno.permissoes
     });
 
     return res
@@ -132,12 +148,11 @@ router.put('/reset/:email', async (req, res) => {
  * Rota [POST] - Envio de email de Codigo de confirmação de alteracao
  *      URL: 'api/auth/sendEmail
  *      Body: {
- *              "email": "kenio@gestao.com",
- *              "codigo": "1234"
+ *              "email":
+ *              "codigo":
  *            }
  */
 router.post('/sendEmail', async (req, res) => {
-    // Se vazio/undefined, barramos o acesso
     if (!req.body || Object.keys(req.body).length === 0) {
         return res
                 .status(400)
@@ -145,12 +160,27 @@ router.post('/sendEmail', async (req, res) => {
     }
 
     const { email, codigo } = req.body;
-    // Validação simples dos dados de entrada
+
     if( !email || !codigo ){
         return res
                 .status(401)
-                .json(ApiResponse(false, "Auth SendEmail: Faltam dados obrigatórios para o envio."));
+                .json(ApiResponse(false, "Auth SendEmail: Faltam dados obrigatórios."));
     }
+
+    // Validação simples de formato de e-mail (usando Regex)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if( !emailRegex.test(email) ){
+        return res
+                .status(400)
+                .json(ApiResponse(false, "Auth SendEmail: email deve ser um e-mail válido."));
+    }
+
+    // Validação simples do codigo de autorização
+    if( isNaN(Number(codigo)) ){
+      return res
+                .status(400)
+                .json(ApiResponse(false, "Auth SendEmail: Código deve ser um numérico."));
+    }   
 
     const assunto = "[Reset Password] - Verificação para troca de Password"
     const texto = `

@@ -17,10 +17,10 @@ const UsuarioPerfisService = require('../services/usuarioPerfis.service');
  * ROTA [POST] - Criar Usuário (C)
  *      URL: 'api/usuario
  *      Body: {
- *              nomeCompleto:
- *              email:
- *              telefone:
- *              senha:
+ *              "nomeCompleto":
+ *              "email":
+ *              "telefone":
+ *              "senha":
  *          }
  */
 router.post('/', async (req, res) => {
@@ -74,15 +74,15 @@ router.get('/id/:id', async (req, res) => {
                 .json(ApiResponse(false, "Usuário BuscarPorId: Parm(id) não foi informado."));
     }
 
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Usuário BuscarPorId: Parm(id) deve ser um numérico."));
     }   
 
     try {
-        const retorno = await UsuarioService.buscarPorId(idParm);
+        const retorno = await UsuarioService.buscarPorId(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Usuário BuscarPorId: Executado com sucesso!", retorno));
@@ -129,11 +129,11 @@ router.get('/email/:email', async (req, res) => {
 
 /*
  * ROTA [PUT] - Atualizar Usuário (U)
- *      URL: 'api/usuario/1
- *      Params: (number) - Id do registro de tabela
+ *      URL: 'api/usuario/id
+ *      Params: (number) - id do registro de tabela
  *      Body: {
- *              'nomeCompleto': 
- *              'telefone':
+ *              "nomeCompleto": 
+ *              "telefone":
  *          }
  */
 router.put('/:id', async (req, res) => {
@@ -142,8 +142,8 @@ router.put('/:id', async (req, res) => {
                 .status(400) 
                 .json(ApiResponse(false, "Usuário Atualizar: Parm(id) não foi informado."));
     }
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
         return res
                 .status(400)
                 .json(ApiResponse(false, "Usuário Atualizar: Parm(id) deve ser um numérico."));
@@ -156,7 +156,7 @@ router.put('/:id', async (req, res) => {
     }
     
     try {
-        const retorno = await UsuarioService.atualizar(idParm, req.body);
+        const retorno = await UsuarioService.atualizar(id, req.body);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Usuário Atualizar: Executado com sucesso!"));
@@ -170,8 +170,8 @@ router.put('/:id', async (req, res) => {
 
 /*
  * ROTA [DELETE] - Deletar Usuário (D)
- *      URL: 'api/usuario/1
- *      Params: (number) - Id do registro da tabela
+ *      URL: 'api/usuario/id
+ *      Params: (number) - id do registro da tabela
  */
 router.delete('/:id', async (req, res) => {
     if (!req.params.id) {
@@ -180,15 +180,15 @@ router.delete('/:id', async (req, res) => {
                 .json(ApiResponse(false, "Usuário Deletar: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Usuário Deletar: Parm(id) deve ser um numérico."));
     }
 
     try {
-        const isDeletado = await UsuarioService.deletar(idParm);
+        const isDeletado = await UsuarioService.deletar(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Usuário Deletar: Executado com sucesso!"));
@@ -202,8 +202,8 @@ router.delete('/:id', async (req, res) => {
 
 /*
  * ROTA [GET] - Busca os associados Usuário e Perfis (R)
- *      URL: 'api/usuario/perfis/1
- *      Params: (number) - Id do registro na tabela (Usuario)
+ *      URL: 'api/usuario/perfis/id
+ *      Params: (number) - id do registro na tabela (Usuario)
  */
 router.get('/perfis/:id', async (req, res) => {
     if (!req.params.id) {
@@ -212,15 +212,15 @@ router.get('/perfis/:id', async (req, res) => {
                 .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
     }
 
     try {
-        const listData = await UsuarioPerfisService.buscarPerfisPorUsuario(idParm);
+        const listData = await UsuarioPerfisService.buscarPerfisPorUsuario(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Usuário Associados: Listados com sucesso!", listData));
@@ -235,8 +235,8 @@ router.get('/perfis/:id', async (req, res) => {
 
 /*
  * ROTA [POST] - Criar associação de Usuário com Perfis(C)
- *      URL: 'api/usuario/perfis/1
- *      Params: (number) - Id do registro na tabela (Usuario)
+ *      URL: 'api/usuario/perfis/id
+ *      Params: (number) - id do registro na tabela (Usuario)
  *      Body: {
  *              "lista": [{"idPerfil": "?", "descricao": "?????"},...]
  *          }
@@ -248,8 +248,8 @@ router.post('/perfis/:id', async (req, res) => {
                 .json(ApiResponse(false, "Usuário Associados: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Usuário Associados: Parm(id) deve ser um numérico."));
@@ -262,7 +262,7 @@ router.post('/perfis/:id', async (req, res) => {
     }
 
     try {
-        const novoDados = await UsuarioPerfisService.criarPerfis(idParm, req.body.lista);
+        const novoDados = await UsuarioPerfisService.criarPerfis(id, req.body.lista);
         return res
                 .status(201)
                 .json(ApiResponse(true, "Usuário Associados: Executado com sucesso!", novoDados));
