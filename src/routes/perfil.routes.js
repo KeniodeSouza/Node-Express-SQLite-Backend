@@ -72,15 +72,15 @@ router.get('/id/:id', async (req, res) => {
                 .json(ApiResponse(false, "Perfil BuscarPorId: Parm(id) não foi informado."));
     }
 
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Perfil BuscarPorId: Parm(id) deve ser um numérico."));
     }   
 
     try {
-        const retorno = await PerfilService.buscarPorId(idParm);
+        const retorno = await PerfilService.buscarPorId(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Perfil BuscarPorId: Executado com sucesso!", retorno));
@@ -131,8 +131,8 @@ router.put('/:id', async (req, res) => {
                 .status(400) 
                 .json(ApiResponse(false, "Perfil Atualizar: Parm(id) não foi informado."));
     }
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
         return res
                 .status(400)
                 .json(ApiResponse(false, "Perfil Atualizar: Parm(id) deve ser um numérico."));
@@ -145,7 +145,7 @@ router.put('/:id', async (req, res) => {
     }
     
     try {
-        const retorno = await PerfilService.atualizar(idParm, req.body);
+        const retorno = await PerfilService.atualizar(id, req.body);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Perfil Atualizar: Executado com sucesso!"));
@@ -169,15 +169,15 @@ router.delete('/:id', async (req, res) => {
                 .json(ApiResponse(false, "Perfil Deletar: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Perfil Deletar: Parm(id) deve ser um numérico."));
     }
 
     try {
-        const isDeletado = await PerfilService.deletar(idParm);
+        const isDeletado = await PerfilService.deletar(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Perfil Deletar: Executado com sucesso!"));
@@ -201,15 +201,15 @@ router.get('/permissoes/:id', async (req, res) => {
                 .json(ApiResponse(false, "Perfil Associados: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Perfil Associados: Parm(id) deve ser um numérico."));
     }
 
     try {
-        const listData = await PerfilPermissoesService.buscarPermissoesPorPerfil(idParm);
+        const listData = await PerfilPermissoesService.buscarPermissoesPorPerfil(id);
         return res
                 .status(200)
                 .json(ApiResponse(true, "Perfil Associados: Listados com sucesso!", listData));
@@ -237,8 +237,8 @@ router.post('/permissoes/:id', async (req, res) => {
                 .json(ApiResponse(false, "Perfil Associados: Parm(id) não foi informado."));
     }
     
-    const idParm = Number(req.params.id);
-    if( isNaN(idParm) ){
+    const id = Number(req.params.id);
+    if( isNaN(id) ){
       return res
                 .status(400)
                 .json(ApiResponse(false, "Perfil Associados: Parm(id) deve ser um numérico."));
@@ -251,7 +251,7 @@ router.post('/permissoes/:id', async (req, res) => {
     }
 
     try {
-        const novoDados = await PerfilPermissoesService.criarPermissoes(idParm, req.body.lista);
+        const novoDados = await PerfilPermissoesService.criarPermissoes(id, req.body.lista);
         return res
                 .status(201)
                 .json(ApiResponse(true, "Perfil Associados: Executado com sucesso!", novoDados));

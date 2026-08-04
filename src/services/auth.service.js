@@ -40,7 +40,7 @@ class AuthService {
     static async buscarCredencial(email, senha){
         const list = await UsuarioRepository.buscarCredencialPorEmail(email);
         if (!list || list.length === 0) {
-            throw new AppError("Credencial não localizada", 2001, 404);
+            throw new AppError("Usuário não localizado", 2001, 404);
         }
         // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
         const senhaCrypt = senha // await bcrypt.hash(senha, 10);
@@ -69,7 +69,7 @@ class AuthService {
         // CRIPTOGRAFIA: Gera o hash da senha com um fator de custo 10
         const senhaCrypt = senha // await bcrypt.hash(senha, 10);
 
-        const retorno = await UsuarioRepository.resetPassword(email, senhaCrypt)
+        const retorno = await UsuarioRepository.atualizarSenha(email, senhaCrypt)
         if( !result ){
             throw new AppError("Usuário não modou a Senha", 2003, 404);
         }

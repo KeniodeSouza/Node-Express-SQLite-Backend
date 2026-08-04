@@ -11,7 +11,6 @@ const authRoutes = require('./routes/auth.routes');
 // Entidade basicas de segurança:
 const usuarioRoutes = require('./routes/usuario.routes');
 const perfilRoutes = require('./routes/perfil.routes');
-const permissaoRoutes = require('./routes/permissao.routes');
 // Dashbord: 
 const reportsRoutes = require('./routes/reports.routes');
 
@@ -27,7 +26,6 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/usuario', usuarioRoutes);
 app.use('/api/perfil', perfilRoutes);
-app.use('/api/permissao', permissaoRoutes);
 app.use('/api/reports', reportsRoutes);
 
 // Inicialização
@@ -41,7 +39,6 @@ app.listen(PORT, () => {
     console.log(`🚧 Auth:      http://localhost:${PORT}/api/auth`);
     console.log(`👥 Usuário:   http://localhost:${PORT}/api/usuario`);
     console.log(`👥 Perfil:    http://localhost:${PORT}/api/perfil`);
-    console.log(`👥 Permissao: http://localhost:${PORT}/api/permissao`);
     console.log(`📊 Reports:   http://localhost:${PORT}/api/reports`);
     console.log(`==================================================\n`);
 });

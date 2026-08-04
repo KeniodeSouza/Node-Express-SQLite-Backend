@@ -62,12 +62,12 @@ class UsuarioService {
 
     // [UPDATE] - Procedimento para atualizar os dados de um usuário
     static async atualizar(id, dados){
-        const retorno = await UsuarioRepository.atualizar(id, dados)
-        if( !retorno || retorno.changes == 0 ){
+        const result = await UsuarioRepository.atualizar(id, dados)
+        if( !result || result.changes == 0 ){
             throw new AppError("Usuário não atualizado no sistema", 2005, 404);
         }
 
-        return null;
+        return await buscarPorId(id);
     }
 
     // [DELETE] - Procedimento para remover um usuário

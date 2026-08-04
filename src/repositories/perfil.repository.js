@@ -7,20 +7,29 @@ class PerfilRepository {
     static async criar(dados) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "INSERT INTO auth_perfil (nome, descricao) " +
-              "VALUES (?, ?)",
-              [dados.nome, dados.descricao ]
-        );
-     
-        const novoDados = {
-            "id": retorno.lastID, 
-            "nome": dados.nome, 
-            "descricao": dados.descricao
-        };
-        
-        // Retorna o objeto recebido concatenado com o id gerado no banco
-        return retorno ? novoDados : null;
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "INSERT INTO auth_perfil (nome, descricao) " +
+                  "VALUES (?, ?)",
+                  [dados.nome, dados.descricao ]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
+
+            const novoDados = {
+                "id": retorno.lastID,
+                "nome": dados.nome,
+                "descricao": dados.descricao
+            };
+            // Retorna o objeto recebido concatenado com o id gerado no banco
+            return novoDados;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 
     /*
@@ -32,7 +41,7 @@ class PerfilRepository {
         const retorno = await db.all(
               "SELECT * " +
               "FROM auth_perfil " +
-			  "WHERE upper(nome) not like '%ADMIN%' " +
+              "WHERE upper(nome) not like '%ADMIN%' " +
               "ORDER BY id ASC"
         );
 
@@ -52,7 +61,7 @@ class PerfilRepository {
               "AND id = ?",
               [id]
         );
-        
+
         return retorno || null;
     }
 
@@ -68,7 +77,7 @@ class PerfilRepository {
               "WHERE nome = ?",
               [nome]
         );
-        
+
         return retorno || null;
     }
 
@@ -78,13 +87,24 @@ class PerfilRepository {
     static async atualizar(id, dados) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "UPDATE auth_perfil " +
-              "SET descricao = ? WHERE id = ?",
-              [dados.descricao, id]
-        );
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "UPDATE auth_perfil " +
+                  "SET descricao = ? WHERE id = ?",
+                  [dados.descricao, id]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
 
-        return retorno;
+            return retorno;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
+
     }
 
     /*
@@ -93,13 +113,23 @@ class PerfilRepository {
     static async deletar(id) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "DELETE FROM auth_perfil " + 
-              "WHERE id = ?",
-              [id]
-        );
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "DELETE FROM auth_perfil " +
+                  "WHERE id = ?",
+                  [id]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
 
-        return retorno;
+            return retorno;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 }
 

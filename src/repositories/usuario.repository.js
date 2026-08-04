@@ -6,21 +6,30 @@ class UsuarioRepository {
      */
     static async criar(dados) {
         const db = await openDb('base');
-
-        const retorno = await db.run(
-              "INSERT INTO auth_usuario (nomeCompleto, email, telefone, senha) VALUES (?, ?, ?, ?)",
-                    [dados.nomeCompleto, dados.email, dados.telefone, dados.senha ]
-        );
-     
-        const novoDados = {
-            "id": retorno.lastID, 
-            "nomeCompleto": dados.nomeCompleto, 
-            "email": dados.email, 
-            "telefone": dados.telefone 
-        };
         
-        // Retorna o objeto recebido concatenado com o id gerado no banco
-        return retorno ? novoDados : null;
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "INSERT INTO auth_usuario (nomeCompleto, email, telefone, senha) VALUES (?, ?, ?, ?)",
+                        [dados.nomeCompleto, dados.email, dados.telefone, dados.senha ]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
+ 
+            const novoDados = {
+                "id": retorno.lastID, 
+                "nomeCompleto": dados.nomeCompleto, 
+                "email": dados.email, 
+                "telefone": dados.telefone 
+            };
+            // Retorna o objeto recebido concatenado com o id gerado no banco
+            return novoDados;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 
     /*
@@ -100,27 +109,46 @@ class UsuarioRepository {
     static async atualizar(id, dados) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "UPDATE auth_usuario " + 
-                 "SET nomeCompleto = ?, telefone = ? WHERE id = ?",
-                            [dados.nomeCompleto, dados.telefone, id]
-        );
-
-        return retorno;
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "UPDATE auth_usuario " + 
+                     "SET nomeCompleto = ?, telefone = ? WHERE id = ?",
+                                [dados.nomeCompleto, dados.telefone, id]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
+            return retorno;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 
     /*
      *  Atualizar a senha de um determinado usuario por Unique
      */
-    static async resetPassword(email, senha) {
+    static async atualizarSenha(email, senha) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "UPDATE auth_usuario " + 
-                "SET senha = ? WHERE email = ?",
-                        [senha, email]
-        );
-        return retorno;
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "UPDATE auth_usuario " + 
+                    "SET senha = ? WHERE email = ?",
+                            [senha, email]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
+            return retorno;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 
     /*
@@ -129,13 +157,22 @@ class UsuarioRepository {
     static async deletar(id) {
         const db = await openDb('base');
 
-        const retorno = await db.run(
-              "DELETE FROM auth_usuario " + 
-               "WHERE id = ?",
-                    [id]
-        );
-
-        return retorno;
+        try {
+            // Inicia a transação
+            await db.run('BEGIN TRANSACTION');
+            const retorno = await db.run(
+                  "DELETE FROM auth_usuario " + 
+                   "WHERE id = ?",
+                        [id]
+            );
+            // Confirma as alterações
+            await db.run('COMMIT');
+            return retorno;
+        } catch (error) {
+            // Desfaz as alterações em caso de erro
+            await db.run('ROLLBACK');
+            throw error;
+        }
     }
 }
 

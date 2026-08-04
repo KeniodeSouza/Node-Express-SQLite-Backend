@@ -27,7 +27,6 @@ class UsuarioPerfisRepository {
      */
     static async criarPerfis(id, lista) {
         const db = await openDb('base');
-        // if (list && list.length > 0) {   }
 
         try {
             // Inicia a transação
